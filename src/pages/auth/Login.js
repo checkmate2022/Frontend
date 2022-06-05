@@ -62,7 +62,6 @@ const Login = () => {
       setError('비밀번호를 입력해주세요.');
     }
   };
-  console.log(error);
   return (
     <Container>
       <form onSubmit={onSubmit}>

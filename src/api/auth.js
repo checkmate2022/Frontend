@@ -39,7 +39,6 @@ export const onIdDoubleCheck = (id, setIdCheck, setIdError) => {
   })
     .then((res) => res.json())
     .then((result) => {
-      console.log('아이디 중복확인');
       if (result.success) {
         if (result.data === 1) {
           // 중복된 아이디
@@ -68,7 +67,6 @@ export const onNickNameDoubleCheck = (
   })
     .then((res) => res.json())
     .then((result) => {
-      console.log('닉네임 중복확인');
       if (result.success) {
         if (result.data === 2) {
           // 중복
