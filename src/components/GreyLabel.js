@@ -8,15 +8,15 @@ const Label = styled.h2`
   align-items: center;
   background: ${colors.grey};
   border-radius: 48px;
-  width: fit-content;
+  width: ${({ width }) => (width ? width : 'fit-content')};
   height: 26px;
   font-size: 14px;
   color: ${colors.black};
   padding: 0 27px 0 27px;
 `;
 
-function GreyLabel({ text }) {
-  return <Label>{text}</Label>;
+function GreyLabel({ text, width }) {
+  return <Label width={width}>{text}</Label>;
 }
 
 export default GreyLabel;
