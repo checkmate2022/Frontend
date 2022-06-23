@@ -1,3 +1,4 @@
+import { set } from 'react-hook-form';
 import { API_BASE_URL } from '../app-config';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
@@ -102,6 +103,29 @@ export const signupApi = (id, password, nickname) => {
         window.location.href = '/login';
       } else {
         alert('다시 시도해주세요!');
+      }
+    });
+};
+
+// 사용자 정보 가져오기
+export const onUserInfoGet = (setPhoto, setNickName, setId, setPassword) => {
+  const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  fetch(API_BASE_URL + '/api/v1/users', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.data;
+        setPhoto(data.userImage);
+        setNickName(data.username);
+        setId(data.userId);
       }
     });
 };
