@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import AuthButton from '../../components/auth/AuthButton';
 import { colors } from '../../styles/theme';
 import { loginApi } from '../../api/auth';
+import { useResetRecoilState } from 'recoil';
+import { menuState, teamState } from '../../store/counter';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  background: red;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 30% 0 10% 0;
 `;
 
 const StyledInput = styled.input`
@@ -53,6 +62,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const resetTeamState = useResetRecoilState(teamState);
+  const resetMenuState = useResetRecoilState(menuState);
+
+  // 팀, 메뉴 atom 값 초기화(추후 세션스토리지로 변경 고민)
+  useEffect(() => {
+    resetTeamState();
+    resetMenuState();
+  });
+
   const onSubmit = (event) => {
     event.preventDefault();
     if (id !== '' && password !== '') {
@@ -65,6 +83,9 @@ const Login = () => {
   };
   return (
     <div>
+      <TitleContainer>
+        <h1 style={{ fontWeight: 600, fontSize: '55px' }}>AvaTwin</h1>
+      </TitleContainer>
       <Container>
         <form onSubmit={onSubmit}>
           <StyledInput

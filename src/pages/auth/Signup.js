@@ -87,7 +87,7 @@ const Signup = () => {
 
   return (
     <Container>
-      <h1 style={{ fontWeight: 600, fontSize: '45px' }}>AvaTwin</h1>
+      <h1 style={{ fontWeight: 600, fontSize: '45px' }}>회원가입</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <GreyLabel text='아이디' />
         <LabelContainer>
