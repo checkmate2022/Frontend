@@ -4,7 +4,7 @@ export const HeaderData = [
   {
     id: 1,
     title: '메인',
-    path: '/',
+    path: '/main',
     type: 'main',
   },
   {

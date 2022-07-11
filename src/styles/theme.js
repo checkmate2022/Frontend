@@ -9,6 +9,7 @@ export const colors = {
   red: '#FF0000',
   lightpink: 'rgba(236, 88, 99, 0.12)',
   teamtype: '#9EAFB9',
+  teamtypedetail: '#816D6D',
   lightpurple: 'rgba(209, 92, 250, 1)',
 
   // 아바타 관리

@@ -1,4 +1,3 @@
-import { set } from 'react-hook-form';
 import { API_BASE_URL } from '../app-config';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
@@ -22,7 +21,7 @@ export const loginApi = (id, password, setError) => {
     .then((result) => {
       if (result.success) {
         localStorage.setItem(ACESS_TOKEN, result.data);
-        window.location.href = '/';
+        window.location.href = '/main';
       } else {
         setError('아이디 또는 비밀번호를 잘못 입력했습니다.');
       }
@@ -100,7 +99,7 @@ export const signupApi = (id, password, nickname) => {
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        window.location.href = '/login';
+        window.location.href = '/';
       } else {
         alert('다시 시도해주세요!');
       }
@@ -126,6 +125,60 @@ export const onUserInfoGet = (setPhoto, setNickName, setId, setPassword) => {
         setPhoto(data.userImage);
         setNickName(data.username);
         setId(data.userId);
+      }
+    });
+};
+
+// 사용자 수정
+export const onChangeUser = (username, password) => {
+  const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  fetch(
+    API_BASE_URL + `/api/v1/users?username=${username}&password=${password}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+    }
+  )
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        // 새로고침
+        window.location.reload();
+      } else {
+        alert('다시 시도해주세요!');
+      }
+    });
+};
+
+// 로그아웃
+export const onLogout = () => {
+  localStorage.setItem(ACESS_TOKEN, null);
+  window.location.href = '/';
+};
+
+// 탈퇴
+export const onDeleteUser = () => {
+  const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  fetch(API_BASE_URL + '/api/v1/users', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        alert('탈퇴 되었습니다!');
+      } else {
+        alert('다시 시도해주세요!');
       }
     });
 };

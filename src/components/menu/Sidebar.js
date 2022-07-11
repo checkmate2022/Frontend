@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import { useRecoilValue } from 'recoil';
 import { menuState, teamState } from '../../store/counter';
+import ChannelAddModal from '../team/ChannelAddModal';
+import ChannelNavModal from './ChannelNavModal';
 
 const Container = styled.div`
   position: fixed;
@@ -44,7 +46,7 @@ const StyledLi = styled.li`
 `;
 
 function Sidebar() {
-  const teamid = useRecoilValue(teamState);
+  const teamId = useRecoilValue(teamState);
   const menutype = useRecoilValue(menuState);
 
   const [dataType, setDataType] = useState([]);
@@ -59,14 +61,33 @@ function Sidebar() {
     }
   }, [menutype]);
 
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
   return (
     <Container>
+      <ChannelNavModal
+        modalIsOpen={modalIsOpen}
+        setIsOpen={setIsOpen}
+        teamId={teamId}
+      />
       <NavContainer>
         <StyledNav>
           <StyledUl>
             {dataType.map((menu) => (
               <StyledLi key={menu.id}>
-                <StyledLink to={`${menu.path}/${teamid}`}>
+                <StyledLink
+                  to={
+                    !menu.modal &&
+                    (menutype === 'team'
+                      ? `team/${teamId}${menu.path}`
+                      : `${menu.path}`)
+                  }
+                  onClick={menu.modal && openModal}
+                >
                   <span>{menu.title}</span>
                 </StyledLink>
               </StyledLi>
@@ -74,6 +95,8 @@ function Sidebar() {
           </StyledUl>
         </StyledNav>
       </NavContainer>
+
+      {menutype === 'team' ? <ChannelAddModal teamId={teamId} /> : <></>}
     </Container>
   );
 }
