@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
-import { PurpleButton } from '../../components/index';
-import { useRecoilValue } from 'recoil';
+import { PurpleButton, JoinMeetingModal } from '../../components/index';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { teamState } from '../../store/counter';
 import { onTeamScheduleGet } from '../../api/teamschedule';
 import ReactCalendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
+import '../../components/team/Calendar.css';
+import { checkafternow } from '../../module/time';
+import { meetingState } from '../../store/meetingcounter';
+import { onCreateSession, onCreateToken } from '../../api/meeting';
 
 const Container = styled.div`
   display: flex;
@@ -34,25 +37,62 @@ const ButtonContainer = styled.div`
 
 const TeamDashboard = () => {
   const teamid = useRecoilValue(teamState);
+  const setMeeting = useSetRecoilState(meetingState);
 
   const navigate = useNavigate();
 
   const [scheduleList, setScheduleList] = useState([]);
+  const [nowList, setNowList] = useState([]);
+  const [timeList, setTimeList] = useState([]);
+
+  // 회의 설정 모달
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  const openModal = (item) => {
+    setIsOpen(true);
+    setMeeting(item);
+  };
 
   // 회의/일정 등록 페이지 이동
   const onScheduleAddPage = () => {
-    window.location.href = `dashboard/scheduleadd`;
+    window.location.href = `/team/${teamid}/dashboard/scheduleadd`;
   };
 
   // 화상회의 바로 시작
-  const onMeetingStartButton = () => {};
+  const onMeetingStartButton = () => {
+    //onCreateSession(234980);
+    window.location.href = `/team/${teamid}/meeting/234980`;
+    //navigate(`/team/${teamid}/meeting/234980`);
+  };
 
   // 일정 불러오기
   useEffect(() => {
     onTeamScheduleGet(teamid, setScheduleList);
   }, []);
 
-  console.log(scheduleList);
+  useEffect(() => {
+    onCheckTime();
+  }, [scheduleList]);
+
+  // 현재 시간 이후 회의 일정만 보여주기
+  const onCheckTime = () => {
+    let list = [];
+
+    scheduleList.map((item) => {
+      if (checkafternow(item.scheduleStartDate)) {
+        if (item.scheduleType === 'CONFERENCE') {
+          list.push(item);
+        }
+      }
+    });
+
+    setNowList(list);
+  };
+
+  // 회의 입장(회의 설정 모달 열기)
+  const onMeetingEnterButton = () => {};
+
+  console.log(nowList);
 
   return (
     <Container>
@@ -62,19 +102,41 @@ const TeamDashboard = () => {
         <PurpleButton text='회의 / 일정 등록' onClick={onScheduleAddPage} />
       </ButtonContainer>
       <TitleText>회의실</TitleText>
-      {scheduleList.map((item) => (
+      {nowList.map((item) => (
         <span
-          style={{ cursor: 'pointer' }}
-          onClick={() =>
-            navigate(`${item.scheduleSeq}`, { state: { item: item } })
-          }
+          style={{ cursor: 'pointer', width: 'fit-content' }}
+          onClick={() => openModal(item)}
+          key={item.scheduleSeq}
         >
-          {item.scheduleName}{' '}
+          {item.scheduleName + '  '}
           {moment(item.scheduleStartDate).format('YYYY년 MM월 DD일 HH:mm')}
         </span>
       ))}
+      {modalIsOpen ? (
+        <JoinMeetingModal modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} />
+      ) : null}
       <TitleText>일정</TitleText>
-      <ReactCalendar />
+      <ReactCalendar
+        showNeighboringMonth={false}
+        //onChange={(e) => console.log(e)}
+        tileContent={({ date, view }) => {
+          if (
+            scheduleList.find(
+              (x) =>
+                moment(x.scheduleStartDate).format('YYYY-MM-DD') ===
+                moment(date).format('YYYY-MM-DD')
+            )
+          ) {
+            return (
+              <>
+                <div className='flex justify-center items-center absoluteDiv'>
+                  <div className='dot'></div>
+                </div>
+              </>
+            );
+          }
+        }}
+      />
     </Container>
   );
 };

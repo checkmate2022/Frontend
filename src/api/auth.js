@@ -107,7 +107,7 @@ export const signupApi = (id, password, nickname) => {
 };
 
 // 사용자 정보 가져오기
-export const onUserInfoGet = (setPhoto, setNickName, setId, setPassword) => {
+export const onUserInfoGet = (setUser, setLoading) => {
   const accessToken = localStorage.getItem(ACESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/users', {
@@ -122,9 +122,10 @@ export const onUserInfoGet = (setPhoto, setNickName, setId, setPassword) => {
     .then((result) => {
       if (result.success) {
         const data = result.data;
-        setPhoto(data.userImage);
-        setNickName(data.username);
-        setId(data.userId);
+        // setPhoto(data.userImage);
+        // setNickName(data.username);
+        setUser(data);
+        setLoading(false);
       }
     });
 };
@@ -179,6 +180,48 @@ export const onDeleteUser = () => {
         alert('탈퇴 되었습니다!');
       } else {
         alert('다시 시도해주세요!');
+      }
+    });
+};
+
+// 사용자 아이디 가져오기
+export const onUserIdInfoGet = () => {
+  const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  fetch(API_BASE_URL + '/api/v1/users', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.data;
+        return data.userId;
+      }
+    });
+};
+
+// 토큰 refresh
+export const onTokenRefresh = () => {
+  const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  fetch(API_BASE_URL + '/api/v1/auth/refresh', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.data;
+        return data.userId;
       }
     });
 };
