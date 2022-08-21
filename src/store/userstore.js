@@ -20,6 +20,11 @@ export const userState = atom({
   default: [],
 });
 
+export const leaderState = atom({
+  key: 'leaderState',
+  default: [],
+});
+
 // export const getUserSelector = selector({
 //   key: 'user/get',
 //   get: async ({ get }) => {
