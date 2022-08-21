@@ -5,7 +5,8 @@ import AuthButton from '../../components/auth/AuthButton';
 import { colors } from '../../styles/theme';
 import { loginApi } from '../../api/auth';
 import { useResetRecoilState } from 'recoil';
-import { menuState, teamState } from '../../store/counter';
+import { menuState, teamState } from '../../store/userstore';
+import { SocialLogin } from '../../components';
 
 const Container = styled.div`
   display: flex;
@@ -19,7 +20,7 @@ const TitleContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  margin: 30% 0 10% 0;
+  margin: 30% 0 5% 0;
 `;
 
 const StyledInput = styled.input`
@@ -107,6 +108,7 @@ const Login = () => {
           <SignupContainer>
             회원이 아니신가요? <StyledLink to='/signup'>회원가입</StyledLink>
           </SignupContainer>
+          <SocialLogin />
         </form>
       </Container>
     </div>

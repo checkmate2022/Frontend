@@ -16,6 +16,11 @@ import BoardTable from './team/BoardTable';
 import JoinMeetingModal from './meeting/JoinMeetingModal';
 import Loading from './Loading';
 import MeetingBar from './meeting/MeetingBar';
+import CommentAdd from './team/CommentAdd';
+import CommentList from './team/CommentList';
+import CalendarDate from './team/CalendarDate';
+import Pagination from './team/Pagination';
+import SocialLogin from './auth/SocialLogin';
 
 export {
   AuthButton,
@@ -36,4 +41,9 @@ export {
   JoinMeetingModal,
   Loading,
   MeetingBar,
+  CommentAdd,
+  CommentList,
+  CalendarDate,
+  Pagination,
+  SocialLogin,
 };
