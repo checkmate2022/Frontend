@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
 import { onChannelGet } from '../../api/teamboard';
-import { NavLink } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import { channelState } from '../../store/boardstore';
+import { useNavigate } from 'react-router-dom';
 
 const customStyles = {
   content: {
@@ -44,7 +46,9 @@ const StyledLi = styled.li`
 
 function ChannelNavModal({ teamId, modalIsOpen, setIsOpen }) {
   //const [modalIsOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const [channelList, setChannelList] = useState([]);
+  const setChannelName = useSetRecoilState(channelState);
 
   // 팀별 게시판 조회
   useEffect(() => {
@@ -71,9 +75,13 @@ function ChannelNavModal({ teamId, modalIsOpen, setIsOpen }) {
                 {channelList.map((channel) => (
                   <StyledLi key={channel.channelSeq}>
                     <StyledSpan
-                      onClick={() =>
-                        (window.location.href = `/team/${teamId}/teamchannel/${channel.channelSeq}`)
-                      }
+                      onClick={() => {
+                        navigate(
+                          `/team/${teamId}/teamchannel/${channel.channelSeq}`
+                        );
+                        closeModal();
+                        setChannelName(channel.channelName);
+                      }}
                     >
                       {channel.channelName}
                     </StyledSpan>

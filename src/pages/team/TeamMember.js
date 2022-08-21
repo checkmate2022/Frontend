@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { MemberBox } from '../../components';
 import { onTeamMemberGet } from '../../api/team';
-import { teamState } from '../../store/counter';
+import { teamState } from '../../store/userstore';
 import { useRecoilValue } from 'recoil';
 
 const Container = styled.div`
@@ -34,7 +34,7 @@ const CardContainer = styled.div`
 
 const TeamMember = () => {
   const [memberList, setMemberList] = useState([]);
-
+  
   const teamid = useRecoilValue(teamState);
 
   // 참여자 불러오기
@@ -44,7 +44,21 @@ const TeamMember = () => {
 
   useEffect(() => {
     onMemberGet();
+    onLeaderFirst();
   }, []);
+
+  // 팀장 1등으로~
+  const onLeaderFirst = () => {
+    let mlist = memberList;
+    memberList.map((member, idx) => {
+      console.log(member, idx);
+      if (member.teamRoleType === 'LEADER') {
+        setMemberList(memberList.splice(0, 0, member));
+        console.log(memberList.splice(0, 0, member));
+      }
+      console.log(memberList);
+    });
+  };
 
   return (
     <Container>

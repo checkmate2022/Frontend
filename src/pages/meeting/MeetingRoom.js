@@ -3,20 +3,27 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { OpenVidu } from 'openvidu-browser';
 import UserVideo from '../../components/meeting/UserVideo';
-import { onCreateSession, onCreateToken } from '../../api/meeting';
-import { useParams } from 'react-router-dom';
+import {
+  onCreateSession,
+  onCreateToken,
+  onLeaveSession,
+} from '../../api/meeting';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, MeetingBar } from '../../components';
-import { mediaState } from '../../store/meetingcounter';
+import { mediaState } from '../../store/meetingstore';
 import { useRecoilState } from 'recoil';
-import { userState } from '../../store/counter';
+import { userState } from '../../store/userstore';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
+const OPENVIDU_SERVER_URL = 'https://' + window.location.hostname + ':4443';
+const OPENVIDU_SERVER_SECRET = 'MY_SECRET';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
   margin: 9% 0 3% 10%;
   width: 80%;
 `;
@@ -25,30 +32,32 @@ const VideoContainer = styled.div``;
 
 const BarContainer = styled.div`
   display: flex;
-  margin-top: 3%;
+  margin-top: 15%;
   width: 63%;
-  justify-content: flex-end;
+  justify-content: center;
 `;
 
 const VideoUl = styled.ul`
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: row-reverse;
-  flex-wrap: wrap-reverse;
+  flex-direction: row;
+  //flex-wrap: wrap-reverse;
   justify-content: center;
   align-items: center;
   list-style: none;
   padding-left: 0;
-  margin: 0;
+  //background-color: red;
 `;
 
 const MeetingRoom = () => {
   const { teamId, meetingId } = useParams();
 
+  const navigate = useNavigate();
+
   const userInfo = useRecoilState(userState);
 
-  const [roomName, setRoomName] = useState('SessionA');
+  const [roomName, setRoomName] = useState(meetingId);
   const [userName, setUserName] = useState(userInfo.userName);
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
@@ -74,7 +83,7 @@ const MeetingRoom = () => {
   useEffect(() => {
     if (session === undefined) {
       joinSession();
-      console.log('joinsession');
+      console.log('joinsession' + meetingId);
     }
     //joinSession();
     console.log('실행되나');
@@ -84,92 +93,176 @@ const MeetingRoom = () => {
 
   // 카메라 조정
   const onVideoSetting = () => {
-    publisher.streamManager.publishVideo(
-      !publisher.streamManager.stream.videoActive
-    );
-    setMedia((prev) => ({ ...prev, video: !prev.video }));
+    if (media.video) {
+      publisher.publishAudio(false);
+      setMedia((prev) => ({ ...prev, video: false }));
+    } else {
+      publisher.publishAudio(true);
+      setMedia((prev) => ({ ...prev, video: true }));
+    }
+    // publisher.streamManager.publishVideo(
+    //   !publisher.streamManager.stream.videoActive
+    // );
+    // setMedia((prev) => ({ ...prev, video: !prev.video }));
   };
 
   // 마이크 조정
   const onMicSetting = () => {
-    publisher.streamManager.publishAudio(
-      !publisher.streamManager.stream.audioActive
-    );
-    // session.signal({ data: JSON.stringify({ isMicOn: !media.mic }), type: "micStatusChanged" });
-    // setPublisher({ ...publisher, isMicOn: !publisher.isMicOn });
-    setMedia((prev) => ({ ...prev, mic: !prev.mic }));
+    if (media.mic) {
+      publisher.publishAudio(false);
+      setMedia((prev) => ({ ...prev, mic: false }));
+    } else {
+      publisher.publishAudio(true);
+      setMedia((prev) => ({ ...prev, mic: true }));
+    }
+    // publisher.streamManager.publishAudio(
+    //   !publisher.streamManager.stream.audioActive
+    // );
+    // // session.signal({ data: JSON.stringify({ isMicOn: !media.mic }), type: "micStatusChanged" });
+    // // setPublisher({ ...publisher, isMicOn: !publisher.isMicOn });
+    // setMedia((prev) => ({ ...prev, mic: !prev.mic }));
   };
 
-  const createSession = (meetingId) => {
-    const accessToken = localStorage.getItem(ACESS_TOKEN);
+  // const createSession = (meetingId) => {
+  //   const accessToken = localStorage.getItem(ACESS_TOKEN);
 
+  //   return new Promise((resolve, reject) => {
+  //     axios
+  //       .post(
+  //         API_BASE_URL +
+  //           '/api/v1/session/create-session?meetingId=' +
+  //           meetingId,
+  //         {},
+  //         {
+  //           headers: {
+  //             Authorization: 'Bearer ' + accessToken,
+  //             'Content-Type': 'application/json',
+  //           },
+  //         }
+  //       )
+  //       .then((response) => {
+  //         console.log('CREATE SESION', response);
+  //         resolve(meetingId);
+  //       })
+  //       .catch((response) => {
+  //         var error = Object.assign({}, response);
+  //         if (error?.response?.status === 409) {
+  //           resolve(meetingId);
+  //         } else {
+  //           console.log(error);
+  //           if (
+  //             window.confirm(
+  //               API_BASE_URL +
+  //                 '"\n\nClick OK to navigate and accept it. ' +
+  //                 'If no certificate warning is shown, then check that your OpenVidu Server is up and running at "' +
+  //                 API_BASE_URL +
+  //                 '"'
+  //             )
+  //           ) {
+  //             window.location.assign(API_BASE_URL + '/accept-certificate');
+  //           }
+  //         }
+  //       });
+  //   });
+  // };
+
+  // const createToken = (meetingId) => {
+  //   const accessToken = localStorage.getItem(ACESS_TOKEN);
+
+  //   return new Promise((resolve, reject) => {
+  //     axios
+  //       .post(
+  //         API_BASE_URL +
+  //           '/api/v1/session/generate-token?meetingId=' +
+  //           meetingId,
+  //         {},
+  //         {
+  //           headers: {
+  //             Authorization: 'Bearer ' + accessToken,
+  //             'Content-Type': 'application/json',
+  //           },
+  //         }
+  //       )
+  //       .then((response) => {
+  //         console.log('TOKEN', response);
+  //         resolve(response['data'][0]);
+  //         setLoading(false);
+  //       })
+  //       .catch((error) => reject(error));
+  //   });
+  // };
+
+  const createSession = (sessionId) => {
     return new Promise((resolve, reject) => {
+      var data = JSON.stringify({ customSessionId: sessionId });
       axios
-        .post(
-          API_BASE_URL +
-            '/api/v1/session/create-session?meetingId=' +
-            meetingId,
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + accessToken,
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        .post(OPENVIDU_SERVER_URL + '/openvidu/api/sessions', data, {
+          headers: {
+            Authorization:
+              'Basic ' + btoa('OPENVIDUAPP:' + OPENVIDU_SERVER_SECRET),
+            'Content-Type': 'application/json',
+          },
+        })
         .then((response) => {
           console.log('CREATE SESION', response);
-          resolve(meetingId);
+          resolve(response.data.id);
         })
         .catch((response) => {
           var error = Object.assign({}, response);
           if (error?.response?.status === 409) {
-            resolve(meetingId);
+            resolve(sessionId);
           } else {
             console.log(error);
+            console.warn(
+              'No connection to OpenVidu Server. This may be a certificate error at ' +
+                OPENVIDU_SERVER_URL
+            );
             if (
               window.confirm(
-                API_BASE_URL +
+                'No connection to OpenVidu Server. This may be a certificate error at "' +
+                  OPENVIDU_SERVER_URL +
                   '"\n\nClick OK to navigate and accept it. ' +
                   'If no certificate warning is shown, then check that your OpenVidu Server is up and running at "' +
-                  API_BASE_URL +
+                  OPENVIDU_SERVER_URL +
                   '"'
               )
             ) {
-              window.location.assign(API_BASE_URL + '/accept-certificate');
+              window.location.assign(
+                OPENVIDU_SERVER_URL + '/accept-certificate'
+              );
             }
           }
         });
     });
   };
 
-  const createToken = (meetingId) => {
-    const accessToken = localStorage.getItem(ACESS_TOKEN);
-
+  const createToken = (sessionId) => {
     return new Promise((resolve, reject) => {
+      var data = {};
       axios
         .post(
-          API_BASE_URL +
-            '/api/v1/session/generate-token?meetingId=' +
-            meetingId,
-          {},
+          OPENVIDU_SERVER_URL +
+            '/openvidu/api/sessions/' +
+            sessionId +
+            '/connection',
+          data,
           {
             headers: {
-              Authorization: 'Bearer ' + accessToken,
+              Authorization:
+                'Basic ' + btoa('OPENVIDUAPP:' + OPENVIDU_SERVER_SECRET),
               'Content-Type': 'application/json',
             },
           }
         )
         .then((response) => {
           console.log('TOKEN', response);
-          resolve(response['data'][0]);
-          setLoading(false);
+          resolve(response.data.token);
         })
         .catch((error) => reject(error));
     });
   };
 
-  const getToken = () => {
+  const getToken = async () => {
     return createSession(meetingId).then((meetingId) => createToken(meetingId));
   };
 
@@ -272,13 +365,11 @@ const MeetingRoom = () => {
   };
 
   const deleteSubscriber = (streamManager) => {
-    let subscribers = subscribers;
-    let index = subscribers.indexOf(streamManager, 0);
+    let newsubscribers = subscribers;
+    let index = newsubscribers.indexOf(streamManager, 0);
     if (index > -1) {
-      subscribers.splice(index, 1);
-      this.setState({
-        subscribers: subscribers,
-      });
+      newsubscribers.splice(index, 1);
+      setSubscribers(newsubscribers);
     }
   };
 
@@ -288,8 +379,9 @@ const MeetingRoom = () => {
     if (mySession) {
       mySession.disconnect();
     }
+    onLeaveSession(meetingId);
     resetRoomInfo();
-    window.location.href(`/team/${teamId}/dashboard`);
+    navigate(`/team/${teamId}/dashboard`);
   };
 
   // 모든 요소 종료
@@ -313,13 +405,12 @@ const MeetingRoom = () => {
       {loading ? <Loading /> : null}
       <div>
         <VideoUl>
-          {publisher !== undefined && (
+          {publisher !== undefined ? (
             <UserVideo streamManager={publisher} count={count} />
-          )}
-          {subscribers &&
-            subscribers.map((sub, i) => (
-              <UserVideo key={i} streamManager={sub} count={count} />
-            ))}
+          ) : null}
+          {subscribers.map((sub, i) => (
+            <UserVideo key={i} streamManager={sub} count={count} />
+          ))}
         </VideoUl>
       </div>
       <BarContainer>

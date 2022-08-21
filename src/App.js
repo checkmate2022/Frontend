@@ -20,26 +20,36 @@ import ScheduleAdd from './pages/team/ScheduleAdd';
 import TeamChannel from './pages/team/TeamChannel';
 import BoardAdd from './pages/team/BoardAdd';
 import ScheduleSetting from './pages/team/ScheduleSetting';
+import MeetingRoom from './pages/meeting/MeetingRoom';
+import BoardChange from './pages/team/BoardChange';
+import OAuth2RedirectHandler from './pages/auth/OAuth2RedirectHandler';
 
 function App() {
   const [currPath, setCurrPath] = useState(window.location.pathname);
 
   useEffect(() => {
     setCurrPath(window.location.pathname);
+    console.log(window.location.pathname);
   }, []);
 
   return (
     <RecoilRoot>
       <BrowserRouter>
-        {currPath !== '/' && currPath !== '/signup' && (
-          <>
-            <Header />
-          </>
-        )}
+        {currPath !== '/' &&
+          currPath !== '/signup' &&
+          currPath !== '/team/:teamId/meeting/:meetingId' && (
+            <>
+              <Header />
+            </>
+          )}
         <div className='contents'>
           <Routes>
             <Route path='/' element={<Login />} exact />
             <Route path='/signup' element={<Signup />} />
+            <Route
+              path='/oauth2/redirect'
+              element={<OAuth2RedirectHandler />}
+            />
             {/* 임시 */}
             <Route path='/main' element={<Main />} />
             <Route path='/avataradd' element={<AvatarAdd />} />
@@ -71,8 +81,18 @@ function App() {
               path='/team/:teamId/teamchannel/:channelId/board/:boardId'
               element={<TeamBoard />}
             />
+            <Route
+              path='/team/:teamId/teamchannel/:channelId/board/:boardId/change'
+              element={<BoardChange />}
+            />
             <Route path='/team/:teamId/teammember' element={<TeamMember />} />
             <Route path='/team/:teamId/teamsetting' element={<TeamSetting />} />
+
+            {/* 화상회의 */}
+            <Route
+              path='/team/:teamId/meeting/:meetingId'
+              element={<MeetingRoom />}
+            />
           </Routes>
         </div>
       </BrowserRouter>

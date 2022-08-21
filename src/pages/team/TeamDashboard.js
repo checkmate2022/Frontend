@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
-import { PurpleButton, JoinMeetingModal } from '../../components/index';
+import {
+  PurpleButton,
+  JoinMeetingModal,
+  CalendarDate,
+} from '../../components/index';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { teamState } from '../../store/counter';
+import { teamState } from '../../store/userstore';
 import { onTeamScheduleGet } from '../../api/teamschedule';
 import ReactCalendar from 'react-calendar';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import '../../components/team/Calendar.css';
 import { checkafternow } from '../../module/time';
-import { meetingState } from '../../store/meetingcounter';
-import { onCreateSession, onCreateToken } from '../../api/meeting';
+import { meetingState } from '../../store/meetingstore';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 80%;
-  margin: 8% 0 3% 15%;
+  margin: 7% 0 3% 15%;
 `;
 
 const TitleText = styled.h5`
@@ -43,7 +46,7 @@ const TeamDashboard = () => {
 
   const [scheduleList, setScheduleList] = useState([]);
   const [nowList, setNowList] = useState([]);
-  const [timeList, setTimeList] = useState([]);
+  const [dateList, setDateList] = useState([]);
 
   // 회의 설정 모달
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -72,6 +75,20 @@ const TeamDashboard = () => {
 
   useEffect(() => {
     onCheckTime();
+
+    // 오늘 일정 가져오기
+    let list = [];
+
+    scheduleList.map((item) => {
+      if (
+        moment(item.scheduleStartDate).format('YYYY-MM-DD') ===
+        moment(new Date()).format('YYYY-MM-DD')
+      ) {
+        list.push(item);
+      }
+    });
+
+    setDateList(list);
   }, [scheduleList]);
 
   // 현재 시간 이후 회의 일정만 보여주기
@@ -85,14 +102,11 @@ const TeamDashboard = () => {
         }
       }
     });
-
     setNowList(list);
   };
 
   // 회의 입장(회의 설정 모달 열기)
   const onMeetingEnterButton = () => {};
-
-  console.log(nowList);
 
   return (
     <Container>
@@ -131,12 +145,30 @@ const TeamDashboard = () => {
               <>
                 <div className='flex justify-center items-center absoluteDiv'>
                   <div className='dot'></div>
+                  <CalendarDate scheduleList={dateList} />
                 </div>
               </>
             );
           }
         }}
+        onClickDay={(day) => {
+          let list = [];
+
+          scheduleList.map((item) => {
+            if (
+              moment(item.scheduleStartDate).format('YYYY-MM-DD') ===
+              moment(day).format('YYYY-MM-DD')
+            ) {
+              list.push(item);
+            }
+          });
+
+          setDateList(list);
+
+          ///console.log(list);
+        }}
       />
+      <CalendarDate scheduleList={dateList} />
     </Container>
   );
 };

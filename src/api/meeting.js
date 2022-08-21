@@ -1,11 +1,11 @@
 import { API_BASE_URL } from '../app-config';
 import axios from 'axios';
 
-const ACESS_TOKEN = 'ACESS_TOKEN';
+const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 // 회의 생성
 export const onCreateSession = (meetingId) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   return new Promise((resolve, reject) => {
     axios
@@ -47,7 +47,7 @@ export const onCreateSession = (meetingId) => {
 
 // 회의 입장 토큰 생성
 export const onCreateToken = (meetingId) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   return new Promise((resolve, reject) => {
     axios
@@ -71,7 +71,7 @@ export const onCreateToken = (meetingId) => {
 
 // 회의 나가기
 export const onLeaveSession = (meetingId) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   return new Promise((resolve, reject) => {
     axios

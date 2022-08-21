@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '../app-config';
 
-const ACESS_TOKEN = 'ACESS_TOKEN';
+const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 // 일정 등록
 export const onScheduleAdd = (
@@ -8,16 +8,18 @@ export const onScheduleAdd = (
   scheduleDescription,
   scheduleStartDate,
   scheduleEndDate,
+  scheduleType,
   participantName,
   teamid
 ) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   const Info = {
     scheduleName: scheduleName,
     scheduleDescription: scheduleDescription,
     scheduleStartDate: scheduleStartDate,
     scheduleEndDate: scheduleEndDate,
+    scheduleType: scheduleType,
     participantName: participantName,
     teamId: teamid,
   };
@@ -37,7 +39,7 @@ export const onScheduleAdd = (
     .then((result) => {
       console.log(result);
       if (result.success) {
-        window.location.href = `/dashboard/${teamid}`;
+        window.location.href = `/team/${teamid}/dashboard/`;
       } else {
         alert('다시 시도해주세요!');
       }
@@ -46,7 +48,7 @@ export const onScheduleAdd = (
 
 // 팀별 일정 조회
 export const onTeamScheduleGet = (teamid, setScheduleList) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/schedule/team/${teamid}`, {
     method: 'GET',
@@ -75,7 +77,7 @@ export const onScheduleChange = (
   teamid,
   scheduleId
 ) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   const Info = {
     scheduleName: scheduleName,
@@ -109,7 +111,7 @@ export const onScheduleChange = (
 
 // 일정 삭제
 export const onScheduleDelete = (teamid, scheduleId) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/schedule/${scheduleId}`, {
     method: 'DELETE',

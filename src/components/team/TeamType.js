@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState, useRecoilState } from 'recoil';
-import { teamState, menuState } from '../../store/counter';
+import { teamState, menuState } from '../../store/userstore';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 

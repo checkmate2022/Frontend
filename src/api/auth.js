@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '../app-config';
 
-const ACESS_TOKEN = 'ACESS_TOKEN';
+const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 // 로그인
 export const loginApi = (id, password, setError) => {
@@ -20,7 +20,7 @@ export const loginApi = (id, password, setError) => {
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        localStorage.setItem(ACESS_TOKEN, result.data);
+        localStorage.setItem(ACCESS_TOKEN, result.data);
         window.location.href = '/main';
       } else {
         setError('아이디 또는 비밀번호를 잘못 입력했습니다.');
@@ -68,7 +68,7 @@ export const onNickNameDoubleCheck = (
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        if (result.data === 2) {
+        if (result.data === 1) {
           // 중복
           setNickError('이미 사용된 닉네임입니다.');
           setNicknameCheck(false);
@@ -108,7 +108,7 @@ export const signupApi = (id, password, nickname) => {
 
 // 사용자 정보 가져오기
 export const onUserInfoGet = (setUser, setLoading) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/users', {
     method: 'GET',
@@ -132,7 +132,7 @@ export const onUserInfoGet = (setUser, setLoading) => {
 
 // 사용자 수정
 export const onChangeUser = (username, password) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(
     API_BASE_URL + `/api/v1/users?username=${username}&password=${password}`,
@@ -158,13 +158,13 @@ export const onChangeUser = (username, password) => {
 
 // 로그아웃
 export const onLogout = () => {
-  localStorage.setItem(ACESS_TOKEN, null);
+  localStorage.setItem(ACCESS_TOKEN, null);
   window.location.href = '/';
 };
 
 // 탈퇴
 export const onDeleteUser = () => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/users', {
     method: 'DELETE',
@@ -184,9 +184,9 @@ export const onDeleteUser = () => {
     });
 };
 
-// 사용자 아이디 가져오기
-export const onUserIdInfoGet = () => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+// 사용자 이름 가져오기(게시글, 댓글 작성자 비교)
+export const onUsernameInfoGet = (setUserName) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/users', {
     method: 'GET',
@@ -200,14 +200,35 @@ export const onUserIdInfoGet = () => {
     .then((result) => {
       if (result.success) {
         const data = result.data;
-        return data.userId;
+        setUserName(data.username);
+      }
+    });
+};
+
+// 사용자 아이디 가져오기(팀장 확인)
+export const onUserIdInfoGet = (setUserId) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+
+  fetch(API_BASE_URL + '/api/v1/users', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.data;
+        setUserId(data.userId);
       }
     });
 };
 
 // 토큰 refresh
 export const onTokenRefresh = () => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/auth/refresh', {
     method: 'GET',

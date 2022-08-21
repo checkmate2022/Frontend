@@ -6,14 +6,14 @@ import OvVideo from './OvVideo';
 const StreamContainer = styled.li`
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
 `;
 
 function UserVideo({ streamManager, count }) {
   const getNicknameTag = () => {
     // 사용자의 닉네임을 가져옴
-    return JSON.parse(streamManager.stream.connection.data).clientData;
+    return JSON.parse(streamManager.stream.connection.data).userName;
   };
 
   const getCount = (number) => {
@@ -34,7 +34,7 @@ function UserVideo({ streamManager, count }) {
     <div>
       {streamManager !== undefined ? (
         <div>
-          <StreamContainer style={getCount(count)}>
+          <StreamContainer style={videostyles.one}>
             <OvVideo streamManager={streamManager} />
             <div>{/* <p style={{ margin: 0 }}>{getNicknameTag()}</p> */}</div>
           </StreamContainer>

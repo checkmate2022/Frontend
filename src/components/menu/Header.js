@@ -6,7 +6,7 @@ import { colors } from '../../styles/theme';
 import { onLogout } from '../../api/auth';
 import Sidebar from './Sidebar';
 import { useRecoilState, useResetRecoilState } from 'recoil';
-import { menuState, teamState } from '../../store/counter';
+import { menuState, teamState } from '../../store/userstore';
 
 const Container = styled.header`
   position: fixed;
@@ -48,7 +48,7 @@ const TextButton = styled.a`
   cursor: pointer;
   position: absolute;
   right: 5%;
-  z-index: 100;
+  z-index: 999;
 `;
 
 function Header() {

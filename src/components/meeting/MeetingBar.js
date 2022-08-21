@@ -12,7 +12,7 @@ import PurpleButton from '../PurpleButton';
 const BarContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   width: fit-content;
   height: fit-content;
@@ -47,6 +47,8 @@ function MeetingBar({
         ) : (
           <BsFillMicMuteFill onClick={onMicSetting} style={iconstyle} />
         )}
+        <div style={{ width: '20px' }} />
+
         <PurpleButton text='나가기' onClick={leaveSession} />
       </IconContainer>
     </BarContainer>

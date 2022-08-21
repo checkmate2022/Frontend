@@ -4,7 +4,7 @@ import { MypageData, TeamData } from './SidebarData';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import { useRecoilValue } from 'recoil';
-import { menuState, teamState } from '../../store/counter';
+import { menuState, teamState } from '../../store/userstore';
 import ChannelAddModal from '../team/ChannelAddModal';
 import ChannelNavModal from './ChannelNavModal';
 
@@ -69,11 +69,16 @@ function Sidebar() {
 
   return (
     <Container>
-      <ChannelNavModal
-        modalIsOpen={modalIsOpen}
-        setIsOpen={setIsOpen}
-        teamId={teamId}
-      />
+      {menutype === 'team' ? (
+        <ChannelNavModal
+          modalIsOpen={modalIsOpen}
+          setIsOpen={setIsOpen}
+          teamId={teamId}
+        />
+      ) : (
+        <></>
+      )}
+
       <NavContainer>
         <StyledNav>
           <StyledUl>
