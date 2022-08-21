@@ -10,11 +10,12 @@ import {
 import MeetingAvatar from './MeetingAvatar';
 import PurpleButton from '../PurpleButton';
 import { useSetRecoilState, useRecoilState } from 'recoil';
-import { mediaState, meetingState } from '../../store/meetingcounter';
-import { useNavigate, useParams } from 'react-router-dom';
-import { teamState, userState } from '../../store/counter';
+import { mediaState, meetingState } from '../../store/meetingstore';
+import { useNavigate } from 'react-router-dom';
+import { teamState, userState } from '../../store/userstore';
 import { onUserInfoGet } from '../../api/auth';
 import Loading from '../Loading';
+import { onCreateSession } from '../../api/meeting';
 
 const customStyles = {
   content: {
@@ -138,8 +139,8 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
 
   // 회의 생성
   const createSession = () => {
-    //onCreateSession(meetingId);
     if (avatarStyle === undefined) {
+      onCreateSession(meetingId);
       alert('아바타를 선택해주세요!');
     } else {
       //window.location.href = `/team/${teamId}/meeting/${meetingId}`;
