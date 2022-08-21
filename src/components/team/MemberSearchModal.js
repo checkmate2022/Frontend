@@ -97,12 +97,35 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
   const onMemberClick = (member) => {
     // 같은 아이디면 안넣기
     let seqlist = [];
-    memberList.map((member) => seqlist.push(member.userSeq));
+    memberList.map((member) => {
+      seqlist.push(member.userSeq);
+    });
     if (!seqlist.includes(member.userSeq)) {
       setMemberList([...memberList, member]);
     }
 
     setIsOpen(false);
+  };
+
+  // 타입에 따라 출력 다르게
+  const onTypeShow = (member) => {
+    if (type === 'user') {
+      return `${member.username}(${member.userId})`;
+    } else if (type === 'schedule') {
+      return `${member.username}`;
+    }
+  };
+
+  const deleteText = (member) => {
+    if (member.teamRoleType === 'MEMBER') {
+      return (
+        <SearchContainer>
+          <DeleteText onClick={() => onRemove(member.userSeq)}>✖</DeleteText>
+        </SearchContainer>
+      );
+    } else if (member.teamRoleType === 'LEADER') {
+      return null;
+    }
   };
 
   // 회원 목록에서 삭제
@@ -134,7 +157,7 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
                 key={member.userSeq}
                 onClick={() => onMemberClick(member)}
               >
-                {member.username}({member.userId})
+                {onTypeShow(member)}
               </MemberText>
             ))}
           </ModalContainer>
@@ -142,13 +165,16 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
       </div>
       {memberList.map((member) => (
         <div style={{ display: 'flex' }} key={member.userSeq}>
-          <StyledInput
-            defaultValue={`${member.username}(${member.userId})`}
-            disabled={true}
-          />
-          <SearchContainer>
-            <DeleteText onClick={() => onRemove(member.userSeq)}>✖</DeleteText>
-          </SearchContainer>
+          <StyledInput defaultValue={onTypeShow(member)} disabled={true} />
+          {type === 'user' ? (
+            deleteText(member)
+          ) : (
+            <SearchContainer>
+              <DeleteText onClick={() => onRemove(member.userSeq)}>
+                ✖
+              </DeleteText>
+            </SearchContainer>
+          )}
         </div>
       ))}
     </div>

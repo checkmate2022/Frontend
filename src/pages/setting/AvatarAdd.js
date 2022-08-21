@@ -188,7 +188,6 @@ const AvatarAdd = () => {
       <AvatarButton
         datas={avatarStyles}
         checkedvalue={avatarStyle}
-        setAvatarStyle={setAvatarStyle}
         onChange={onClickRadioButton}
       />
       <GreyLabel text='아바타 스타일 번호' />

@@ -1,8 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
+import GreyLabel from '../GreyLabel';
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const MemberContainer = styled.div`
   width: 300px;
   height: 290px;
   background: ${colors.avatarcolor[2]};
@@ -46,28 +54,18 @@ const DetailContainer = styled.div`
 
 function MemberBox({ member }) {
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ display: 'flex' }}>
-        {/* <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginRight: '30px',
-          }}
-        >
-          {avatar ? <GreyLabel text='팀장' /> : <></>}
-        </div> */}
-        <Container key={member.userSeq}>
-          <ImgContainer>
-            <StyledImg src={''} />
-          </ImgContainer>
-          <DetailContainer>
-            <NameText>{member.username}</NameText>
-            <StyledText>{member.userId}</StyledText>
-          </DetailContainer>
-        </Container>
-      </div>
-    </div>
+    <Container>
+      {member.teamRoleType === 'LEADER' ? <GreyLabel text='팀장' /> : null}
+      <MemberContainer>
+        <ImgContainer>
+          <StyledImg src={''} />
+        </ImgContainer>
+        <DetailContainer>
+          <NameText>{member.username}</NameText>
+          <StyledText>{member.userId}</StyledText>
+        </DetailContainer>
+      </MemberContainer>
+    </Container>
   );
 }
 

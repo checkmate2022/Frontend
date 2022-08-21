@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
-import { PurpleButton } from '../../components';
+import { PurpleButton, MemberSearchModal } from '../../components';
 import { useRecoilValue } from 'recoil';
-import { teamState } from '../../store/counter';
-import { onTeamChange, onTeamDelete, onTeamInfoGet } from '../../api/team';
+import { leaderState, teamState } from '../../store/userstore';
+import {
+  onTeamChange,
+  onTeamDelete,
+  onTeamInfoGet,
+  onTeamMemberGet,
+} from '../../api/team';
 
 const Container = styled.div`
   display: flex;
@@ -59,21 +64,29 @@ const TeamSetting = () => {
   const [teamMember, setTeamMember] = useState([]);
   const [teamDetail, setTeamDetail] = useState('');
 
-  const teamid = useRecoilValue(teamState);
+  const teamId = useRecoilValue(teamState);
 
   // 팀 정보 불러오기
   useEffect(() => {
-    onTeamInfoGet(teamid, setTeamName, setTeamMember, setTeamDetail);
+    onTeamInfoGet(teamId, setTeamName, setTeamDetail);
+    onTeamMemberGet(setTeamMember, teamId);
   }, []);
 
   // 팀 삭제
   const onTeamDeleteButton = () => {
-    onTeamDelete(teamid);
+    onTeamDelete(teamId);
   };
 
   // 팀 관리 수정
   const onTeamChangeButton = () => {
-    onTeamChange(teamid, teamName, teamDetail, teamMember);
+    let namelist = [];
+    teamMember.map((member) => {
+      if (member.teamRoleType === 'MEMBER') {
+        namelist.push(member.username);
+      }
+    });
+
+    onTeamChange(teamId, teamName, teamDetail, namelist);
   };
 
   return (
@@ -84,7 +97,11 @@ const TeamSetting = () => {
         value={teamName}
         onChange={(e) => setTeamName(e.target.value)}
       />
-      <StyledInput placeholder='참여자' Defaultvalue={''} />
+      <MemberSearchModal
+        setMemberList={setTeamMember}
+        memberList={teamMember}
+        type='user'
+      />
 
       <StyledTextArea
         type='text'
@@ -94,9 +111,9 @@ const TeamSetting = () => {
         onChange={(e) => setTeamDetail(e.target.value)}
       />
       <ButtonContainer>
-        <PurpleButton text='팀 삭제' onClick={onTeamDeleteButton} />
-        <div style={{ width: '1%' }} />
         <PurpleButton text='수정' onClick={onTeamChangeButton} />
+        <div style={{ width: '1%' }} />
+        <PurpleButton text='팀 삭제' onClick={onTeamDeleteButton} />
       </ButtonContainer>
     </Container>
   );

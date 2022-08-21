@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { onTeamAllGet } from '../../api/team';
-import { PurpleButton } from '../../components';
+import { Loading, PurpleButton } from '../../components';
 import TeamType from '../../components/team/TeamType';
 
 const Container = styled.div`
@@ -21,16 +21,16 @@ const ButtonContainer = styled.div`
 
 const CenterContainer = styled.div`
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+const EmptyContainer = styled(CenterContainer)`
+  flex-direction: column;
   margin-top: 10%;
 `;
 
-const TeamContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+const TeamContainer = styled(CenterContainer)`
   margin-left: 5%;
 `;
 
@@ -51,9 +51,10 @@ const CardContainer = styled.div`
 
 const Teammain = () => {
   const [teamList, setTeamList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    onTeamAllGet(setTeamList);
+    onTeamAllGet(setTeamList, setLoading);
   }, []);
 
   // 팀 생성 페이지로 이동
@@ -61,16 +62,19 @@ const Teammain = () => {
     window.location.href = '/teamadd';
   };
 
+  console.log(loading);
+
   return (
     <Container>
+      {loading ? <Loading /> : null}
       <ButtonContainer>
         <PurpleButton text='생성' onClick={onAddPage} />
       </ButtonContainer>
       {teamList.length === 0 ? (
         <>
-          <CenterContainer>
+          <EmptyContainer>
             <h2>생성된 프로젝트가 없습니다.</h2>
-          </CenterContainer>
+          </EmptyContainer>
         </>
       ) : (
         <TeamContainer>
