@@ -40,7 +40,7 @@ function BoardTable({ data }) {
 
   // 게시글로 이동
   const onClickBoard = (item) => {
-    navigate(`board/${item.baordSeq}`, { state: { item: item } });
+    navigate(`board/${item.boardSeq}`, { state: { item: item } });
   };
 
   return (
@@ -54,13 +54,13 @@ function BoardTable({ data }) {
       </thead>
       <tbody>
         {data.map((item) => (
-          <tr key={item.baordSeq}>
+          <tr key={item.boardSeq}>
             <TitleBodyTd onClick={() => onClickBoard(item)}>
               {item.title}
             </TitleBodyTd>
             <StyledBodyTd>{item.username}</StyledBodyTd>
             <StyledBodyTd>
-              {moment(item.createDate).format('YYYY/MM/DD  hh:mm')}
+              {moment(item.createDate).format('YYYY/MM/DD  HH:mm')}
             </StyledBodyTd>
           </tr>
         ))}
