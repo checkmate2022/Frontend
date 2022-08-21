@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
-import { GreyLabel, PurpleButton } from '../../components';
+import { GreyLabel, Loading, PurpleButton } from '../../components';
 import { onUserInfoGet } from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 11% 0 3% 6%;
+  margin: 13% 0 3% 6%;
 `;
 
 const LabelContainer = styled.div`
@@ -29,47 +30,54 @@ const StyledImg = styled.img`
 `;
 
 const Mypage = () => {
-  const [photo, setPhoto] = useState('');
-  const [nickname, setNickName] = useState('');
-  const [id, setId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState([]);
   const [password, setPassword] = useState('비밀번호');
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    onUserInfoGet(setPhoto, setNickName, setId, setPassword);
+    onUserInfoGet(setUser, setLoading);
   }, []);
 
   // 수정 페이지로 이동
   const onChange = () => {
-    window.location.href = '/mypagechange';
+    navigate('/mypagechange', { state: { user: user } });
   };
 
   return (
     <Container>
-      <LabelContainer>
-        <GreyLabel width='70px' text='프로필 사진' />
-        <StyledImg src={photo} />
-      </LabelContainer>
-      <LabelContainer>
-        <GreyLabel width='70px' text='닉네임' />
-        <StyledInput defaultValue={nickname} />
-      </LabelContainer>
-      <LabelContainer>
-        <GreyLabel width='70px' text='아이디' />
-        <StyledInput defaultValue={id} />
-      </LabelContainer>
-      <LabelContainer>
-        <GreyLabel width='70px' text='비밀번호' />
-        <StyledInput defaultValue={password} type='password' />
-      </LabelContainer>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginTop: '10%',
-        }}
-      >
-        <PurpleButton text='수정' onClick={onChange} />
-      </div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <LabelContainer>
+            <GreyLabel width='70px' text='프로필 사진' />
+            <StyledImg src={user.userImage} />
+          </LabelContainer>
+          <LabelContainer>
+            <GreyLabel width='70px' text='닉네임' />
+            <StyledInput defaultValue={user.username} disabled />
+          </LabelContainer>
+          <LabelContainer>
+            <GreyLabel width='70px' text='아이디' />
+            <StyledInput defaultValue={user.userId} disabled />
+          </LabelContainer>
+          <LabelContainer>
+            <GreyLabel width='70px' text='비밀번호' />
+            <StyledInput defaultValue={password} type='password' disabled />
+          </LabelContainer>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '10%',
+            }}
+          >
+            <PurpleButton text='수정' onClick={onChange} />
+          </div>
+        </>
+      )}
     </Container>
   );
 };
