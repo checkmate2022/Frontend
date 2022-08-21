@@ -1,13 +1,13 @@
 import { API_BASE_URL } from '../app-config';
 
-const ACESS_TOKEN = 'ACESS_TOKEN';
+const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 // 아바타 이름 중복확인
 export const onAvatarNameCheck = (name, setAvatarName) => {};
 
 // 아바타 등록
 export const avatarAddapi = (avatarInfo, imgfile, createdfile) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   var formData = new FormData();
 
@@ -50,7 +50,7 @@ export const avatarChangeApi = (
   avatarInfo,
   setCreatedPreview
 ) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   var formData = new FormData();
 
@@ -96,7 +96,7 @@ export const avatarChangeApi = (
 
 // 전체 아바타 조회
 export const onAvatarAllGet = (setAvatarList) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/avatar', {
     method: 'GET',
@@ -118,7 +118,7 @@ export const onAvatarAllGet = (setAvatarList) => {
 
 // 아바타 삭제
 export const onAvatarDelete = (id) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/avatar/' + parseInt(id), {
     method: 'DELETE',

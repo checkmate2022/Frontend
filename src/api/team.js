@@ -1,10 +1,10 @@
 import { API_BASE_URL } from '../app-config';
 
-const ACESS_TOKEN = 'ACESS_TOKEN';
+const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 // 사용자별 팀 조회
-export const onTeamAllGet = (setTeamList) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+export const onTeamAllGet = (setTeamList, setLoading) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + '/api/v1/team/user', {
     method: 'GET',
@@ -18,6 +18,7 @@ export const onTeamAllGet = (setTeamList) => {
     .then((result) => {
       if (result.success) {
         const data = result.list;
+        setLoading(false);
         setTeamList(data);
       }
     });
@@ -25,7 +26,7 @@ export const onTeamAllGet = (setTeamList) => {
 
 // 팀 등록
 export const onTeamAdd = (teamName, teamDescription, participantName) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   const Info = {
     teamName: teamName,
@@ -57,7 +58,7 @@ export const onTeamAdd = (teamName, teamDescription, participantName) => {
 // 팀별 사용자 조회
 export const onTeamMemberGet = (setMemberList, id) => {
   console.log(id);
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/team/${id}/user`, {
     method: 'GET',
@@ -80,7 +81,7 @@ export const onTeamMemberGet = (setMemberList, id) => {
 // 팀 등록을 위한 사용자 정보 조회
 // data 값으로 유저를 검색(get)후 반환
 export const onUserInfoGet = (setUserList, user) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/users/search?query=${user}`, {
     method: 'GET',
@@ -102,7 +103,7 @@ export const onUserInfoGet = (setUserList, user) => {
 
 // 팀 삭제
 export const onTeamDelete = (id) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/team/${id}`, {
     method: 'DELETE',
@@ -130,7 +131,7 @@ export const onTeamChange = (
   teamDescription,
   participantName
 ) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   const Info = {
     teamName: teamName,
@@ -152,7 +153,7 @@ export const onTeamChange = (
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        window.location.href = `/teamsetting/${id}`;
+        window.location.reload();
       } else {
         alert('다시 시도해주세요!');
       }
@@ -160,13 +161,8 @@ export const onTeamChange = (
 };
 
 // 단건 팀 조회
-export const onTeamInfoGet = (
-  id,
-  setTeamName,
-  setTeamMember,
-  setTeamDetail
-) => {
-  const accessToken = localStorage.getItem(ACESS_TOKEN);
+export const onTeamInfoGet = (id, setTeamName, setTeamDetail) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(API_BASE_URL + `/api/v1/team/${id}`, {
     method: 'GET',
@@ -181,10 +177,11 @@ export const onTeamInfoGet = (
       if (result.success) {
         let team = result.data;
         setTeamName(team.teamName);
-        setTeamMember(team.participantName);
         setTeamDetail(team.teamDescription);
       } else {
         alert('다시 시도해주세요!');
       }
     });
 };
+
+//
