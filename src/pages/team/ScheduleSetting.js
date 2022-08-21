@@ -8,7 +8,7 @@ import {
   PurpleButton,
 } from '../../components';
 import { useRecoilValue } from 'recoil';
-import { teamState } from '../../store/counter';
+import { teamState } from '../../store/userstore';
 import 'react-datepicker/dist/react-datepicker.css';
 import { onScheduleAdd, onScheduleDelete } from '../../api/teamschedule';
 import moment, { localeData } from 'moment';

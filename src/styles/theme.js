@@ -11,6 +11,7 @@ export const colors = {
   teamtype: '#9EAFB9',
   teamtypedetail: '#816D6D',
   lightpurple: 'rgba(209, 92, 250, 1)',
+  kakao: '#FEE500',
 
   // 아바타 관리
   avatarcolor: {

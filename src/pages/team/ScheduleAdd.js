@@ -8,10 +8,10 @@ import {
   PurpleButton,
 } from '../../components';
 import { useRecoilValue } from 'recoil';
-import { teamState } from '../../store/counter';
+import { teamState } from '../../store/userstore';
 import 'react-datepicker/dist/react-datepicker.css';
 import { onScheduleAdd } from '../../api/teamschedule';
-import moment, { localeData } from 'moment';
+import moment from 'moment-timezone';
 
 const Container = styled.div`
   display: flex;
@@ -97,8 +97,9 @@ const ScheduleAdd = () => {
     onScheduleAdd(
       scheduleName,
       scheduleDescription,
-      moment(scheduleStartDate).format('yyyy-MM-dd HH:mm:ss'),
-      moment(scheduleEndDate).format('yyyy-MM-dd HH:mm:ss'),
+      moment.tz(scheduleStartDate, 'Asia/Seoul'),
+      moment.tz(scheduleEndDate, 'Asia/Seoul'),
+      scheduleType,
       // scheduleStartDate,
       // scheduleEndDate,
       namelist,
@@ -106,7 +107,7 @@ const ScheduleAdd = () => {
     );
   };
 
-  console.log(moment(scheduleStartDate).format('yyyy-MM-dd HH:mm'));
+  console.log();
 
   return (
     <Container>
@@ -126,7 +127,7 @@ const ScheduleAdd = () => {
       <RowContainer>
         <DropBox
           options={OPTIONS}
-          defaultValue='DEFAULT'
+          defaultValue='BASIC'
           setState={setScheduleType}
           board={false}
         />
@@ -159,8 +160,8 @@ const ScheduleAdd = () => {
 };
 
 const OPTIONS = [
-  { value: 'DEFAULT', name: '일정' },
-  { value: 'MEETING', name: '회의' },
+  { value: 'BASIC', name: '일정' },
+  { value: 'CONFERENCE', name: '회의' },
 ];
 
 export default ScheduleAdd;
