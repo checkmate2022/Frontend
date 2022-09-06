@@ -22,7 +22,7 @@ export const userState = atom({
 
 export const leaderState = atom({
   key: 'leaderState',
-  default: [],
+  default: '',
 });
 
 // export const getUserSelector = selector({

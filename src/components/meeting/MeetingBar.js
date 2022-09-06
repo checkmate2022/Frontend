@@ -7,7 +7,9 @@ import {
   BsFillMicFill,
   BsFillMicMuteFill,
 } from 'react-icons/bs';
+import SwitchVideoIcon from '@material-ui/icons/SwitchVideo';
 import PurpleButton from '../PurpleButton';
+import IconButton from '@material-ui/core/IconButton';
 
 const BarContainer = styled.div`
   display: flex;
@@ -29,6 +31,7 @@ function MeetingBar({
   onVideoSetting,
   onMicSetting,
   leaveSession,
+  switchCamera,
 }) {
   return (
     <BarContainer>
@@ -48,7 +51,8 @@ function MeetingBar({
           <BsFillMicMuteFill onClick={onMicSetting} style={iconstyle} />
         )}
         <div style={{ width: '20px' }} />
-
+        <SwitchVideoIcon style={iconstyle} onClick={switchCamera} />
+        <div style={{ width: '20px' }} />
         <PurpleButton text='나가기' onClick={leaveSession} />
       </IconContainer>
     </BarContainer>

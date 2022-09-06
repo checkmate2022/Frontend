@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '../app-config';
 
 const ACCESS_TOKEN = 'ACCESS_TOKEN';
+const JWT_EXPIRY_TIME = 24 * 3600 * 1000; // 만료 시간 (24시간 밀리 초로 표현)
 
 // 로그인
 export const loginApi = (id, password, setError) => {
@@ -22,6 +23,7 @@ export const loginApi = (id, password, setError) => {
       if (result.success) {
         localStorage.setItem(ACCESS_TOKEN, result.data);
         window.location.href = '/main';
+        onLoginSuccess(result.data);
       } else {
         setError('아이디 또는 비밀번호를 잘못 입력했습니다.');
       }
@@ -242,7 +244,16 @@ export const onTokenRefresh = () => {
     .then((result) => {
       if (result.success) {
         const data = result.data;
+        onLoginSuccess(result.data);
         return data.userId;
       }
     });
+};
+
+export const onLoginSuccess = (accessToken) => {
+  // accessToken 설정
+  localStorage.setItem(ACCESS_TOKEN, accessToken);
+
+  // accessToken 만료하기 1분 전에 로그인 연장
+  setTimeout(onTokenRefresh, JWT_EXPIRY_TIME - 60000);
 };

@@ -21,6 +21,8 @@ import CommentList from './team/CommentList';
 import CalendarDate from './team/CalendarDate';
 import Pagination from './team/Pagination';
 import SocialLogin from './auth/SocialLogin';
+import ChattingBar from './meeting/ChattingBar';
+import ChatContent from './meeting/ChatContent';
 
 export {
   AuthButton,
@@ -46,4 +48,6 @@ export {
   CalendarDate,
   Pagination,
   SocialLogin,
+  ChattingBar,
+  ChatContent,
 };
