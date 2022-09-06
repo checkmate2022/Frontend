@@ -184,4 +184,29 @@ export const onTeamInfoGet = (id, setTeamName, setTeamDetail) => {
     });
 };
 
-//
+// 팀장 아이디 가져오기
+export const onTeamLeaderGet = (setLeader, id, setLoading) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+
+  fetch(API_BASE_URL + `/api/v1/team/${id}/user`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.list;
+
+        data.map((item) => {
+          if (item.teamRoleType === 'LEADER') {
+            setLeader(item.userId);
+          }
+        });
+        setLoading(false);
+      }
+    });
+};

@@ -7,7 +7,7 @@ import {
   CalendarDate,
 } from '../../components/index';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { teamState } from '../../store/userstore';
+import { teamState, userState } from '../../store/userstore';
 import { onTeamScheduleGet } from '../../api/teamschedule';
 import ReactCalendar from 'react-calendar';
 import moment from 'moment';
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../components/team/Calendar.css';
 import { checkafternow } from '../../module/time';
 import { meetingState } from '../../store/meetingstore';
+import { onTeamLeaderGet } from '../../api/team';
 
 const Container = styled.div`
   display: flex;

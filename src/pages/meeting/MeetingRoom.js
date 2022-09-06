@@ -9,10 +9,12 @@ import {
   onLeaveSession,
 } from '../../api/meeting';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loading, MeetingBar } from '../../components';
+import { ChattingBar, Loading, MeetingBar } from '../../components';
 import { mediaState } from '../../store/meetingstore';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../store/userstore';
+import { onUsernameInfoGet } from '../../api/auth';
+import { LeakRemoveTwoTone } from '@material-ui/icons';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
@@ -32,7 +34,7 @@ const VideoContainer = styled.div``;
 
 const BarContainer = styled.div`
   display: flex;
-  margin-top: 15%;
+  margin-top: 10%;
   width: 63%;
   justify-content: center;
 `;
@@ -50,24 +52,32 @@ const VideoUl = styled.ul`
   //background-color: red;
 `;
 
+const ChattingContainer = styled.div`
+  // width: 10%;
+  // display: flex;
+
+  position: fixed;
+  right: 0;
+  width: 20%;
+  height: 100%;
+`;
+
 const MeetingRoom = () => {
   const { teamId, meetingId } = useParams();
 
   const navigate = useNavigate();
 
-  const userInfo = useRecoilState(userState);
+  const [OV, setOV] = useState(new OpenVidu());
+  const [session, setSession] = useState(OV.initSession());
 
   const [roomName, setRoomName] = useState(meetingId);
-  const [userName, setUserName] = useState(userInfo.userName);
-  const [session, setSession] = useState(undefined);
-  const [mainStreamManager, setMainStreamManager] = useState(undefined);
+  const [userName, setUserName] = useState('');
   const [publisher, setPublisher] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
   const [media, setMedia] = useRecoilState(mediaState);
+  const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
 
   const [count, setCount] = useState(1);
-
-  const [OV, setOV] = useState(undefined);
 
   // 로딩 스피너
   const [loading, setLoading] = useState(true);
@@ -81,23 +91,28 @@ const MeetingRoom = () => {
   };
 
   useEffect(() => {
-    if (session === undefined) {
-      joinSession();
-      console.log('joinsession' + meetingId);
-    }
-    //joinSession();
+    onUsernameInfoGet(setUserName);
+    // if (userName !== '') {
+    //   joinSession();
+    // }
+    joinSession();
+
     console.log('실행되나');
   }, []);
+
+  // useEffect(() => {
+  //   connection();
+  // }, []);
 
   console.log('publisher:' + publisher + 'subscribers: ' + subscribers);
 
   // 카메라 조정
   const onVideoSetting = () => {
     if (media.video) {
-      publisher.publishAudio(false);
+      publisher.publishVideo(false);
       setMedia((prev) => ({ ...prev, video: false }));
     } else {
-      publisher.publishAudio(true);
+      publisher.publishVideo(true);
       setMedia((prev) => ({ ...prev, video: true }));
     }
     // publisher.streamManager.publishVideo(
@@ -209,7 +224,7 @@ const MeetingRoom = () => {
         })
         .catch((response) => {
           var error = Object.assign({}, response);
-          if (error?.response?.status === 409) {
+          if (error.response && error.response.status === 409) {
             resolve(sessionId);
           } else {
             console.log(error);
@@ -238,7 +253,7 @@ const MeetingRoom = () => {
 
   const createToken = (sessionId) => {
     return new Promise((resolve, reject) => {
-      var data = {};
+      var data = JSON.stringify({});
       axios
         .post(
           OPENVIDU_SERVER_URL +
@@ -267,110 +282,97 @@ const MeetingRoom = () => {
   };
 
   // 회의 참가
-  const joinSession = () => {
-    const newOV = new OpenVidu();
-    //newOV.enableProdMode();
-    const newSession = newOV.initSession();
+  const joinSession = async () => {
+    const devices = await OV.getDevices();
+    const videoDevices = devices.filter(
+      (device) => device.kind === 'videoinput'
+    );
+    getToken().then((token) => {
+      session
+        .connect(token, { userName: userName })
+        .then(async () => {
+          OV.getUserMedia({
+            audioSource: false,
+            videoSource: undefined,
+            resolution: '1280x720',
+            frameRate: 10,
+          }).then((mediaStream) => {
+            console.log('닉네임' + userName);
+            console.log('비디오트랙' + mediaStream.getVideoTracks());
+            let videoTrack = mediaStream.getVideoTracks()[0];
 
-    setOV(newOV);
-    setSession(newSession);
+            let publisher = OV.initPublisher(undefined, {
+              audioSource: undefined,
+              // videoSource: videoTrack,
+              videoSource: videoDevices[0].deviceId,
+              publishAudio: media.mic,
+              publishVideo: media.video,
+              insertMode: 'APPEND',
+              mirror: false,
+            });
 
-    const connection = () => {
-      // 스트림 생성
-      newSession.on('streamCreated', (event) => {
-        const newSubscriber = newSession.subscribe(event.stream, undefined);
-        const newSubscribers = subscribers;
-        newSubscribers.push(newSubscriber);
-
-        // setSubscribers([...subscribers]);
-        setSubscribers(newSubscribers);
-        setCount((prev) => prev + 1);
-      });
-
-      // 스트림 삭제
-      newSession.on('streamDestroyed', (event) => {
-        //event.preventDefault();
-        deleteSubscriber(event.stream.streamManager);
-        setCount((prev) => prev - 1);
-      });
-
-      newSession.on('exception', (exception) => {
-        console.warn(exception);
-      });
-
-      // 채팅 보내기
-      newSession
-        .signal({
-          data: 'My custom message', // Any string (optional)
-          to: [], // Array of Connection objects (optional. Broadcast to everyone if empty)
-          type: 'my-chat', // The type of message (optional)
-        })
-        .then(() => {
-          console.log('Message successfully sent');
+            publisher.once('accessAllowed', () => {
+              session.publish(publisher);
+              setPublisher(publisher);
+              //setMainStreamManager(publisher);
+            });
+            setCurrentVideoDevice(videoDevices[0]);
+          });
+          setLoading(false);
         })
         .catch((error) => {
-          console.error(error);
+          console.warn(
+            'There was an error connecting to the session:',
+            error.code,
+            error.message
+          );
         });
-
-      // 채팅 수신
-      newSession.on('signal:my-chat', (event) => {
-        console.log(event.data); // Message
-        console.log(event.from); // Connection object of the sender
-        console.log(event.type); // The type of message ("my-chat")
-      });
-
-      getToken().then((token) => {
-        newSession
-          .connect(token, { userName: userName })
-          .then(async () => {
-            newOV
-              .getUserMedia({
-                audioSource: false,
-                videoSource: undefined,
-                resolution: '1280x720',
-                frameRate: 10,
-              })
-              .then((mediaStream) => {
-                console.log('비디오트랙' + mediaStream.getVideoTracks());
-                var videoTrack = mediaStream.getVideoTracks()[0];
-
-                var publisher = newOV.initPublisher(undefined, {
-                  audioSource: undefined,
-                  videoSource: videoTrack,
-                  publishAudio: true,
-                  publishVideo: true,
-                  insertMode: 'APPEND',
-                  mirror: true,
-                });
-
-                publisher.once('accessAllowed', () => {
-                  newSession.publish(publisher);
-                  setPublisher(publisher);
-                  setMainStreamManager(publisher);
-                });
-              });
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.warn(
-              'There was an error connecting to the session:',
-              error.code,
-              error.message
-            );
-          });
-      });
-    };
-
+    });
     connection();
   };
 
-  const deleteSubscriber = (streamManager) => {
-    let newsubscribers = subscribers;
-    let index = newsubscribers.indexOf(streamManager, 0);
-    if (index > -1) {
-      newsubscribers.splice(index, 1);
-      setSubscribers(newsubscribers);
-    }
+  const connection = () => {
+    // 스트림 생성
+    session.on('streamCreated', (event) => {
+      const newSubscriber = session.subscribe(event.stream, undefined);
+      // const newSubscribers = subscribers;
+
+      // console.log('체크', event.stream);
+      // newSubscribers.push(newSubscriber);
+
+      // setSubscribers([...subscribers]);
+      const { data, connectionId } = event.stream.connection;
+      //const { nickname } = JSON.parse(data);
+
+      console.log('체크', connectionId);
+      setSubscribers((prev) => [...prev, { newSubscriber, connectionId }]);
+      setCount((prev) => prev + 1);
+    });
+
+    // 스트림 삭제
+    session.on('streamDestroyed', (event) => {
+      //event.preventDefault();
+      deleteSubscriber(event.stream.streamManager);
+      setCount((prev) => prev - 1);
+    });
+
+    session.on('exception', (exception) => {
+      console.warn(exception);
+    });
+  };
+
+  const deleteSubscriber = (event) => {
+    // let newsubscribers = subscribers;
+    // let index = newsubscribers.indexOf(streamManager, 0);
+    // if (index > -1) {
+    //   newsubscribers.splice(index, 1);
+    //   setSubscribers(newsubscribers);
+    // }
+    setSubscribers((prev) =>
+      prev.filter(
+        (user) => user.connectionId !== event.stream.connection.connectionId
+      )
+    );
   };
 
   // 회의 종료
@@ -390,13 +392,40 @@ const MeetingRoom = () => {
     setSession(undefined);
     setSubscribers([]);
     setRoomName('');
-    setMainStreamManager(undefined);
     setPublisher(undefined);
   };
 
-  const handleMainVideoStream = (stream) => {
-    if (mainStreamManager !== stream) {
-      setMainStreamManager(stream);
+  // 화면 전환
+  const switchCamera = async () => {
+    try {
+      const devices = await OV.getDevices();
+      const videoDevices = devices.filter(
+        (device) => device.kind === 'videoinput'
+      );
+
+      if (videoDevices && videoDevices.length > 1) {
+        const newVideoDevice = videoDevices.filter(
+          (device) => device.deviceId !== currentVideoDevice.deviceId
+        );
+
+        if (newVideoDevice.length > 0) {
+          const newPublisher = OV.initPublisher(undefined, {
+            audioSource: undefined,
+            videoSource: newVideoDevice[0].deviceId,
+            publishAudio: media.mic,
+            publishVideo: media.video,
+            mirror: false,
+          });
+
+          //newPublisher.once("accessAllowed", () => {
+          await session.unpublish(publisher);
+          await session.publish(newPublisher);
+          setPublisher(newPublisher);
+          setCurrentVideoDevice(newVideoDevice);
+        }
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -413,6 +442,14 @@ const MeetingRoom = () => {
           ))}
         </VideoUl>
       </div>
+      <ChattingContainer>
+        <ChattingBar
+          session={session}
+          userName={userName}
+          streamManager={publisher}
+        />
+      </ChattingContainer>
+
       <BarContainer>
         <MeetingBar
           isVideo={media.video}
@@ -420,6 +457,7 @@ const MeetingRoom = () => {
           onVideoSetting={onVideoSetting}
           onMicSetting={onMicSetting}
           leaveSession={leaveSession}
+          switchCamera={switchCamera}
         />
       </BarContainer>
     </Container>

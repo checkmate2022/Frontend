@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import OvVideo from './OvVideo';
@@ -10,11 +10,26 @@ const StreamContainer = styled.li`
   align-items: center;
 `;
 
+const Video = styled.video`
+  // width: 100%;
+  // height: auto;
+  // float: left;
+  // // cursor: pointer;
+
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  transform: rotateY(180deg);
+`;
+
 function UserVideo({ streamManager, count }) {
-  const getNicknameTag = () => {
-    // 사용자의 닉네임을 가져옴
-    return JSON.parse(streamManager.stream.connection.data).userName;
-  };
+  const videoRef = useRef();
+
+  // const getNicknameTag = () => {
+  //   // 사용자의 닉네임을 가져옴
+
+  //   return JSON.parse(streamManager.stream.connection.data).userName;
+  // };
 
   const getCount = (number) => {
     switch (number) {
@@ -30,13 +45,24 @@ function UserVideo({ streamManager, count }) {
     }
   };
 
+  useEffect(() => {
+    if (videoRef) {
+      streamManager.addVideoElement(videoRef.current);
+    }
+  }, [streamManager]);
+
+  console.log('streamManager' + streamManager);
+  //console.log('비디오닉네임' + getNicknameTag());
   return (
     <div>
       {streamManager !== undefined ? (
         <div>
           <StreamContainer style={videostyles.one}>
-            <OvVideo streamManager={streamManager} />
-            <div>{/* <p style={{ margin: 0 }}>{getNicknameTag()}</p> */}</div>
+            <Video autoPlay={true} ref={videoRef} />
+            {/* <p>{getNicknameTag()}</p>
+            <div>
+              <p style={{ margin: 0 }}>{getNicknameTag()}</p>
+            </div> */}
           </StreamContainer>
         </div>
       ) : null}

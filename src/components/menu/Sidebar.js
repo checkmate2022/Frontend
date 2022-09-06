@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { MypageData, TeamData } from './SidebarData';
+import { LeaderData, MypageData, TeamData } from './SidebarData';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import { useRecoilValue } from 'recoil';
-import { menuState, teamState } from '../../store/userstore';
+import { leaderState, menuState, teamState } from '../../store/userstore';
 import ChannelAddModal from '../team/ChannelAddModal';
 import ChannelNavModal from './ChannelNavModal';
+import { onUserIdInfoGet } from '../../api/auth';
+import { onTeamLeaderGet, onTeamMemberGet } from '../../api/team';
+import Loading from '../Loading';
 
 const Container = styled.div`
   position: fixed;
@@ -51,15 +54,35 @@ function Sidebar() {
 
   const [dataType, setDataType] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [leaderId, setLeaderId] = useState('');
+
+  // 팀장, 유저아이디 조회
+  // useEffect(() => {
+  //   if (menutype === 'team') {
+  //     onUserIdInfoGet(setUserId);
+  //     onTeamLeaderGet(setLeaderId, teamId);
+  //   }
+  // }, []);
+  console.log(userId, leaderId, userId === leaderId);
+
   useEffect(() => {
     if (menutype === 'mypage') {
       setDataType(MypageData);
     } else if (menutype === 'team') {
-      setDataType(TeamData);
+      setLoading(true);
+      onUserIdInfoGet(setUserId);
+      onTeamLeaderGet(setLeaderId, teamId, setLoading);
+      if (userId === leaderId) {
+        setDataType(LeaderData);
+      } else {
+        setDataType(TeamData);
+      }
     } else {
       setDataType([]);
     }
-  }, [menutype]);
+  }, [menutype, leaderId]);
 
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -69,6 +92,7 @@ function Sidebar() {
 
   return (
     <Container>
+      {loading ? <Loading /> : null}
       {menutype === 'team' ? (
         <ChannelNavModal
           modalIsOpen={modalIsOpen}
@@ -78,7 +102,6 @@ function Sidebar() {
       ) : (
         <></>
       )}
-
       <NavContainer>
         <StyledNav>
           <StyledUl>
