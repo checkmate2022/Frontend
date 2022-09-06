@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { onLogout } from '../api/auth';
+import { menuState, teamState } from '../store/userstore';
 import { colors } from '../styles/theme';
+import { useRecoilState, useResetRecoilState } from 'recoil';
 
 const Container = styled.div`
   display: flex;
@@ -44,7 +47,24 @@ const StyledImg = styled.img`
   z-index: 89;
 `;
 
+const TextButton = styled.a`
+  cursor: pointer;
+  position: absolute;
+  right: 5%;
+  z-index: 999;
+  top: 33px;
+`;
+
 const Main = () => {
+  const resetTeamState = useResetRecoilState(teamState);
+  const resetMenuState = useResetRecoilState(menuState);
+
+  const onLoginButton = () => {
+    resetTeamState();
+    resetMenuState();
+    onLogout();
+  };
+
   return (
     <Container>
       <TextContainer>
@@ -54,6 +74,7 @@ const Main = () => {
         </MainText>
       </TextContainer>
       <PurpleContainer />
+      <TextButton onClick={onLoginButton}>로그아웃</TextButton>
       <StyledImg alt='main' src='images/main_image.png' />
     </Container>
   );

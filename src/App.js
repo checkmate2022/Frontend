@@ -23,6 +23,7 @@ import ScheduleSetting from './pages/team/ScheduleSetting';
 import MeetingRoom from './pages/meeting/MeetingRoom';
 import BoardChange from './pages/team/BoardChange';
 import OAuth2RedirectHandler from './pages/auth/OAuth2RedirectHandler';
+import { onTokenRefresh } from './api/auth';
 
 function App() {
   const [currPath, setCurrPath] = useState(window.location.pathname);
@@ -31,6 +32,10 @@ function App() {
     setCurrPath(window.location.pathname);
     console.log(window.location.pathname);
   }, []);
+
+  useEffect(() => {
+    onTokenRefresh();
+  });
 
   return (
     <RecoilRoot>
