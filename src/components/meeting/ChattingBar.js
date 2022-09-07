@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import Send from '@material-ui/icons/Send';
 import { Tooltip } from '@material-ui/core';
@@ -12,7 +11,7 @@ const Container = styled.div`
   position: absolute;
   z-index: 0;
   width: 100%;
-  height: 70%;
+  height: 80%;
 `;
 
 const ChatComponent = styled.div`
@@ -63,6 +62,11 @@ const StyledInput = styled.input`
   }
 `;
 
+const ChatImg = styled.img`
+  width: 100%;
+  height: 100%;
+`;
+
 function ChattingBar({ session, streamManager, userName }) {
   const [messageList, setMessageList] = useState([]);
   const [message, setMessage] = useState('');
@@ -73,31 +77,33 @@ function ChattingBar({ session, streamManager, userName }) {
   console.log('messageList', messageList);
 
   useEffect(() => {
-    if (session) {
-      session.on('signal:chat', (event) => {
-        const data = JSON.parse(event.data);
-        console.log(data);
-        setMessageList((prev) => [...prev, data]);
-        // let newmessageList = messageList;
-        // newmessageList.push({
-        //   // connectionId: data.streamId,
-        //   nickname: data.nickname,
-        //   message: data.message,
-        // });
-        // const document = window.document;
-        // setTimeout(() => {
-        //   const userImg = document.getElementById(
-        //     'userImg-' + (newmessageList.length - 1)
-        //   );
-        //   const video = document.getElementById('video-' + data.streamId);
-        //   const avatar = userImg.getContext('2d');
-        //   avatar.drawImage(video, 200, 120, 285, 285, 0, 0, 60, 60);
-        // }, 50);
-        // setMessageList(newmessageList);
-        scrollToBottom();
-      });
-    }
-  }, [session]);
+    session.on('signal:chat', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('실행이 왜 안되냐');
+      console.log('event.from', event.from);
+      console.log('data', data);
+      console.log('streamManager', streamManager);
+      console.log('connectionId', event.from.connectionId);
+      setMessageList((prev) => [...prev, data]);
+      // let newmessageList = messageList;
+      // newmessageList.push({
+      //   // connectionId: data.streamId,
+      //   nickname: data.nickname,
+      //   message: data.message,
+      // });
+      // const document = window.document;
+      // setTimeout(() => {
+      //   const userImg = document.getElementById(
+      //     'userImg-' + (newmessageList.length - 1)
+      //   );
+      //   const video = document.getElementById('video-' + data.streamId);
+      //   const avatar = userImg.getContext('2d');
+      //   avatar.drawImage(video, 200, 120, 285, 285, 0, 0, 60, 60);
+      // }, 50);
+      // setMessageList(newmessageList);
+      scrollToBottom();
+    });
+  }, []);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -136,6 +142,7 @@ function ChattingBar({ session, streamManager, userName }) {
         message,
         time,
         userName: userName,
+        img: 'https://image.jtbcplus.kr/data/contents/jam_photo/202002/07/3e4bc737-0d46-44c7-a169-95277ea2357c.jpg',
       }),
       type: 'chat',
     });
@@ -157,7 +164,7 @@ function ChattingBar({ session, streamManager, userName }) {
           <span>채팅</span>
         </ChatToolbar>
         <ChatContainer ref={chatScroll}>
-          {messageList.map((data, i) => (
+          {/* {messageList.map((data, i) => (
             <div key={i} id='remoteUsers'>
               <div className='msg-detail'>
                 <div className='msg-info'>
@@ -166,11 +173,12 @@ function ChattingBar({ session, streamManager, userName }) {
                 <div className='msg-content'>
                   <span className='triangle' />
                   <p className='text'>{data.message}</p>
+                  <ChatImg src={data.img} />
                 </div>
               </div>
             </div>
-          ))}
-          <ChatContent chats={messageList} />
+          ))} */}
+          <ChatContent chats={messageList} scrollToBottom={scrollToBottom} />
         </ChatContainer>
 
         <div id='messageInput'>

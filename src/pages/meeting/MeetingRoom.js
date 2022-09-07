@@ -14,7 +14,6 @@ import { mediaState } from '../../store/meetingstore';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../store/userstore';
 import { onUsernameInfoGet } from '../../api/auth';
-import { LeakRemoveTwoTone } from '@material-ui/icons';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
@@ -58,7 +57,7 @@ const ChattingContainer = styled.div`
 
   position: fixed;
   right: 0;
-  width: 20%;
+  width: 25%;
   height: 100%;
 `;
 
@@ -67,7 +66,8 @@ const MeetingRoom = () => {
 
   const navigate = useNavigate();
 
-  const [OV, setOV] = useState(new OpenVidu());
+  // const [OV, setOV] = useState(new OpenVidu());
+  const OV = new OpenVidu();
   const [session, setSession] = useState(OV.initSession());
 
   const [roomName, setRoomName] = useState(meetingId);
@@ -287,38 +287,34 @@ const MeetingRoom = () => {
     const videoDevices = devices.filter(
       (device) => device.kind === 'videoinput'
     );
+    console.log(videoDevices);
+
     getToken().then((token) => {
       session
         .connect(token, { userName: userName })
         .then(async () => {
-          OV.getUserMedia({
-            audioSource: false,
-            videoSource: undefined,
+          // OV.getUserMedia({}).then(() => {
+          let publisher = OV.initPublisher(undefined, {
+            audioSource: undefined,
+            // videoSource: videoTrack,
+            videoSource: videoDevices[1].deviceId,
+            publishAudio: media.mic,
+            publishVideo: media.video,
+            insertMode: 'APPEND',
+            mirror: false,
             resolution: '1280x720',
             frameRate: 10,
-          }).then((mediaStream) => {
-            console.log('닉네임' + userName);
-            console.log('비디오트랙' + mediaStream.getVideoTracks());
-            let videoTrack = mediaStream.getVideoTracks()[0];
-
-            let publisher = OV.initPublisher(undefined, {
-              audioSource: undefined,
-              // videoSource: videoTrack,
-              videoSource: videoDevices[0].deviceId,
-              publishAudio: media.mic,
-              publishVideo: media.video,
-              insertMode: 'APPEND',
-              mirror: false,
-            });
-
-            publisher.once('accessAllowed', () => {
-              session.publish(publisher);
-              setPublisher(publisher);
-              //setMainStreamManager(publisher);
-            });
-            setCurrentVideoDevice(videoDevices[0]);
           });
+
+          publisher.once('accessAllowed', () => {
+            session.publish(publisher);
+            setPublisher(publisher);
+            //setMainStreamManager(publisher);
+          });
+          setCurrentVideoDevice(videoDevices[1]);
           setLoading(false);
+
+          // });
         })
         .catch((error) => {
           console.warn(
@@ -388,7 +384,7 @@ const MeetingRoom = () => {
 
   // 모든 요소 종료
   const resetRoomInfo = () => {
-    setOV(null);
+    // setOV(null);
     setSession(undefined);
     setSubscribers([]);
     setRoomName('');
@@ -407,6 +403,7 @@ const MeetingRoom = () => {
         const newVideoDevice = videoDevices.filter(
           (device) => device.deviceId !== currentVideoDevice.deviceId
         );
+        console.log(newVideoDevice);
 
         if (newVideoDevice.length > 0) {
           const newPublisher = OV.initPublisher(undefined, {
@@ -421,7 +418,7 @@ const MeetingRoom = () => {
           await session.unpublish(publisher);
           await session.publish(newPublisher);
           setPublisher(newPublisher);
-          setCurrentVideoDevice(newVideoDevice);
+          setCurrentVideoDevice(newVideoDevice[0]);
         }
       }
     } catch (e) {

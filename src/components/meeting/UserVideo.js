@@ -27,7 +27,6 @@ function UserVideo({ streamManager, count }) {
 
   // const getNicknameTag = () => {
   //   // 사용자의 닉네임을 가져옴
-
   //   return JSON.parse(streamManager.stream.connection.data).userName;
   // };
 
