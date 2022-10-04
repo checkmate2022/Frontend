@@ -16,10 +16,11 @@ const Video = styled.video`
   // float: left;
   // // cursor: pointer;
 
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
+  width: 80%;
+  height: 80%;
   transform: rotateY(180deg);
+  object-fit: none;
+  //object-fit: contain;
 `;
 
 function UserVideo({ streamManager, count }) {
