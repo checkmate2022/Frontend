@@ -4,7 +4,7 @@ export const MypageData = [
   {
     id: 1,
     title: '개인정보 수정',
-    path: '/Mypage',
+    path: '/mypage',
     modal: false,
   },
   {
