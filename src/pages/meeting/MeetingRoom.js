@@ -18,6 +18,7 @@ import { onUsernameInfoGet } from '../../api/auth';
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
 const OPENVIDU_SERVER_URL = 'https://' + window.location.hostname + ':4443';
+///const OPENVIDU_SERVER_URL = 'https://52.79.239.28:4443';
 const OPENVIDU_SERVER_SECRET = 'MY_SECRET';
 
 const Container = styled.div`
@@ -29,11 +30,14 @@ const Container = styled.div`
   width: 80%;
 `;
 
-const VideoContainer = styled.div``;
+const VideoContainer = styled.div`
+  margin-right: 30%;
+  margin-top: 5%;
+`;
 
 const BarContainer = styled.div`
-  display: flex;
-  margin-top: 10%;
+  position: absolute;
+  bottom: 20px;
   width: 63%;
   justify-content: center;
 `;
@@ -331,17 +335,13 @@ const MeetingRoom = () => {
     // 스트림 생성
     session.on('streamCreated', (event) => {
       const newSubscriber = session.subscribe(event.stream, undefined);
-      // const newSubscribers = subscribers;
+      const newSubscribers = subscribers;
 
-      // console.log('체크', event.stream);
-      // newSubscribers.push(newSubscriber);
+      console.log('체크', event.stream);
+      newSubscribers.push(newSubscriber);
 
-      // setSubscribers([...subscribers]);
-      const { data, connectionId } = event.stream.connection;
-      //const { nickname } = JSON.parse(data);
+      setSubscribers([...subscribers]);
 
-      console.log('체크', connectionId);
-      setSubscribers((prev) => [...prev, { newSubscriber, connectionId }]);
       setCount((prev) => prev + 1);
     });
 
@@ -373,13 +373,14 @@ const MeetingRoom = () => {
 
   // 회의 종료
   const leaveSession = () => {
-    const mySession = session;
-    if (mySession) {
-      mySession.disconnect();
+    //const mySession = session;
+    if (session) {
+      session.disconnect();
     }
     onLeaveSession(meetingId);
     resetRoomInfo();
     navigate(`/team/${teamId}/dashboard`);
+    //window.location.href = `/team/${teamId}/dashboard`;
   };
 
   // 모든 요소 종료
@@ -429,7 +430,7 @@ const MeetingRoom = () => {
   return (
     <Container>
       {loading ? <Loading /> : null}
-      <div>
+      <VideoContainer>
         <VideoUl>
           {publisher !== undefined ? (
             <UserVideo streamManager={publisher} count={count} />
@@ -438,7 +439,7 @@ const MeetingRoom = () => {
             <UserVideo key={i} streamManager={sub} count={count} />
           ))}
         </VideoUl>
-      </div>
+      </VideoContainer>
       <ChattingContainer>
         <ChattingBar
           session={session}
