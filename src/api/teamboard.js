@@ -24,7 +24,7 @@ export const onChannelAdd = (teamId, channelName) => {
       console.log(result);
       if (result.success) {
         let channelId = result.data.channelSeq;
-        window.location.href = `/team/${teamId}/teamchannel/${channelId}`;
+        window.location.reload();
       } else {
         alert('다시 시도해주세요!');
       }
@@ -231,11 +231,12 @@ export const onChannelGet = (teamId, setChannelList) => {
 };
 
 // 댓글 생성
-export const onCommentAdd = (boardId, content, setCommentList) => {
+export const onCommentAdd = (boardId, content, emoticonUrl, setCommentList) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   fetch(
-    API_BASE_URL + `/api/v1/comment?boardId=${boardId}&content=${content}`,
+    API_BASE_URL +
+      `/api/v1/comment?boardId=${boardId}&content=${content}&emoticonUrl=${emoticonUrl}`,
     {
       method: 'POST',
       headers: {
