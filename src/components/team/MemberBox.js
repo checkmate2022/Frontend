@@ -51,14 +51,20 @@ const DetailContainer = styled.div`
   flex-direction: column;
   margin: 7% 0 0 8%;
 `;
+const LeaderContainer = styled.div`
+  position: absolute;
+  top: -50px;
+`;
 
 function MemberBox({ member }) {
   return (
     <Container>
-      {member.teamRoleType === 'LEADER' ? <GreyLabel text='팀장' /> : null}
+      <LeaderContainer>
+        {member.teamRoleType === 'LEADER' ? <GreyLabel text='팀장' /> : null}
+      </LeaderContainer>
       <MemberContainer>
         <ImgContainer>
-          <StyledImg src={''} />
+          <StyledImg src={member.userImg} />
         </ImgContainer>
         <DetailContainer>
           <NameText>{member.username}</NameText>

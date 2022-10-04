@@ -77,7 +77,7 @@ const TeamAdd = () => {
       <MemberSearchModal
         setMemberList={setMemberList}
         memberList={memberList}
-        type='user'
+        type='useradd'
       />
 
       <StyledTextArea
