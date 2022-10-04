@@ -12,6 +12,7 @@ import { teamState } from '../../store/userstore';
 import 'react-datepicker/dist/react-datepicker.css';
 import { onScheduleAdd } from '../../api/teamschedule';
 import moment from 'moment-timezone';
+import 'moment/locale/ko';
 
 const Container = styled.div`
   display: flex;
@@ -38,6 +39,7 @@ const StyledInput = styled.input`
   font-size: 14px;
   padding: 12px;
   margin: 0 5px 1% 0;
+  cursor: ${({ typestyle }) => (typestyle === 'date' ? 'pointer' : 'auto')};
 
   &:focus {
     outline: 0.3px solid ${colors.purple};
@@ -89,6 +91,8 @@ const ScheduleAdd = () => {
   // LocalDate  d1 = LocalDate.parse(date1, df);
   // LocalDate  d2 = LocalDate.parse(date2, df);
 
+  const offset = new Date().getTimezoneOffset() * 60000;
+
   // 일정 등록
   const onScheduleAddButton = () => {
     let namelist = [];
@@ -97,14 +101,21 @@ const ScheduleAdd = () => {
     onScheduleAdd(
       scheduleName,
       scheduleDescription,
-      moment.tz(scheduleStartDate, 'Asia/Seoul'),
-      moment.tz(scheduleEndDate, 'Asia/Seoul'),
+      moment.tz(new Date(scheduleStartDate - offset), 'Asia/Seoul'),
+      moment.tz(new Date(scheduleEndDate - offset), 'Asia/Seoul'),
       scheduleType,
       // scheduleStartDate,
       // scheduleEndDate,
       namelist,
       teamid
     );
+  };
+
+  // 시간 뒤로
+  const filterPassedTime = (time) => {
+    const selectedDate = new Date(time);
+
+    return scheduleStartDate.getTime() < selectedDate.getTime();
   };
 
   console.log();
@@ -136,6 +147,7 @@ const ScheduleAdd = () => {
           selected={scheduleStartDate}
           onChange={(date) => setScheduleStartDate(date)}
           customInput={<StyledInput typestyle='date' />}
+          minDate={new Date()}
         />
         <div style={{ marginRight: '10px' }} />
         <TitleText>~</TitleText>
@@ -143,6 +155,8 @@ const ScheduleAdd = () => {
           selected={scheduleEndDate}
           onChange={(date) => setScheduleEndDate(date)}
           customInput={<StyledInput typestyle='date' />}
+          minDate={scheduleStartDate}
+          filterTime={filterPassedTime}
         />
       </RowContainer>
       <StyledTextArea

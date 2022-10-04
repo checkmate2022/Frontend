@@ -14,11 +14,11 @@ import { mediaState } from '../../store/meetingstore';
 import { useRecoilState } from 'recoil';
 import { userState } from '../../store/userstore';
 import { onUsernameInfoGet } from '../../api/auth';
-import { LeakRemoveTwoTone } from '@material-ui/icons';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
 const OPENVIDU_SERVER_URL = 'https://' + window.location.hostname + ':4443';
+///const OPENVIDU_SERVER_URL = 'https://52.79.239.28:4443';
 const OPENVIDU_SERVER_SECRET = 'MY_SECRET';
 
 const Container = styled.div`
@@ -30,11 +30,14 @@ const Container = styled.div`
   width: 80%;
 `;
 
-const VideoContainer = styled.div``;
+const VideoContainer = styled.div`
+  margin-right: 30%;
+  margin-top: 5%;
+`;
 
 const BarContainer = styled.div`
-  display: flex;
-  margin-top: 10%;
+  position: absolute;
+  bottom: 20px;
   width: 63%;
   justify-content: center;
 `;
@@ -58,7 +61,7 @@ const ChattingContainer = styled.div`
 
   position: fixed;
   right: 0;
-  width: 20%;
+  width: 25%;
   height: 100%;
 `;
 
@@ -67,7 +70,8 @@ const MeetingRoom = () => {
 
   const navigate = useNavigate();
 
-  const [OV, setOV] = useState(new OpenVidu());
+  // const [OV, setOV] = useState(new OpenVidu());
+  const OV = new OpenVidu();
   const [session, setSession] = useState(OV.initSession());
 
   const [roomName, setRoomName] = useState(meetingId);
@@ -287,38 +291,34 @@ const MeetingRoom = () => {
     const videoDevices = devices.filter(
       (device) => device.kind === 'videoinput'
     );
+    console.log(videoDevices);
+
     getToken().then((token) => {
       session
         .connect(token, { userName: userName })
         .then(async () => {
-          OV.getUserMedia({
-            audioSource: false,
-            videoSource: undefined,
+          // OV.getUserMedia({}).then(() => {
+          let publisher = OV.initPublisher(undefined, {
+            audioSource: undefined,
+            // videoSource: videoTrack,
+            videoSource: videoDevices[1].deviceId,
+            publishAudio: media.mic,
+            publishVideo: media.video,
+            insertMode: 'APPEND',
+            mirror: false,
             resolution: '1280x720',
             frameRate: 10,
-          }).then((mediaStream) => {
-            console.log('닉네임' + userName);
-            console.log('비디오트랙' + mediaStream.getVideoTracks());
-            let videoTrack = mediaStream.getVideoTracks()[0];
-
-            let publisher = OV.initPublisher(undefined, {
-              audioSource: undefined,
-              // videoSource: videoTrack,
-              videoSource: videoDevices[0].deviceId,
-              publishAudio: media.mic,
-              publishVideo: media.video,
-              insertMode: 'APPEND',
-              mirror: false,
-            });
-
-            publisher.once('accessAllowed', () => {
-              session.publish(publisher);
-              setPublisher(publisher);
-              //setMainStreamManager(publisher);
-            });
-            setCurrentVideoDevice(videoDevices[0]);
           });
+
+          publisher.once('accessAllowed', () => {
+            session.publish(publisher);
+            setPublisher(publisher);
+            //setMainStreamManager(publisher);
+          });
+          setCurrentVideoDevice(videoDevices[1]);
           setLoading(false);
+
+          // });
         })
         .catch((error) => {
           console.warn(
@@ -335,17 +335,13 @@ const MeetingRoom = () => {
     // 스트림 생성
     session.on('streamCreated', (event) => {
       const newSubscriber = session.subscribe(event.stream, undefined);
-      // const newSubscribers = subscribers;
+      const newSubscribers = subscribers;
 
-      // console.log('체크', event.stream);
-      // newSubscribers.push(newSubscriber);
+      console.log('체크', event.stream);
+      newSubscribers.push(newSubscriber);
 
-      // setSubscribers([...subscribers]);
-      const { data, connectionId } = event.stream.connection;
-      //const { nickname } = JSON.parse(data);
+      setSubscribers([...subscribers]);
 
-      console.log('체크', connectionId);
-      setSubscribers((prev) => [...prev, { newSubscriber, connectionId }]);
       setCount((prev) => prev + 1);
     });
 
@@ -377,18 +373,19 @@ const MeetingRoom = () => {
 
   // 회의 종료
   const leaveSession = () => {
-    const mySession = session;
-    if (mySession) {
-      mySession.disconnect();
+    //const mySession = session;
+    if (session) {
+      session.disconnect();
     }
     onLeaveSession(meetingId);
     resetRoomInfo();
     navigate(`/team/${teamId}/dashboard`);
+    //window.location.href = `/team/${teamId}/dashboard`;
   };
 
   // 모든 요소 종료
   const resetRoomInfo = () => {
-    setOV(null);
+    // setOV(null);
     setSession(undefined);
     setSubscribers([]);
     setRoomName('');
@@ -407,6 +404,7 @@ const MeetingRoom = () => {
         const newVideoDevice = videoDevices.filter(
           (device) => device.deviceId !== currentVideoDevice.deviceId
         );
+        console.log(newVideoDevice);
 
         if (newVideoDevice.length > 0) {
           const newPublisher = OV.initPublisher(undefined, {
@@ -421,7 +419,7 @@ const MeetingRoom = () => {
           await session.unpublish(publisher);
           await session.publish(newPublisher);
           setPublisher(newPublisher);
-          setCurrentVideoDevice(newVideoDevice);
+          setCurrentVideoDevice(newVideoDevice[0]);
         }
       }
     } catch (e) {
@@ -432,7 +430,7 @@ const MeetingRoom = () => {
   return (
     <Container>
       {loading ? <Loading /> : null}
-      <div>
+      <VideoContainer>
         <VideoUl>
           {publisher !== undefined ? (
             <UserVideo streamManager={publisher} count={count} />
@@ -441,7 +439,7 @@ const MeetingRoom = () => {
             <UserVideo key={i} streamManager={sub} count={count} />
           ))}
         </VideoUl>
-      </div>
+      </VideoContainer>
       <ChattingContainer>
         <ChattingBar
           session={session}

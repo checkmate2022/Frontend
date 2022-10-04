@@ -14,7 +14,7 @@ const Container = styled.div`
 `;
 
 const MemberContainer = styled.div`
-  margin: 1% 0 0 1%;
+  margin: 5% 0 0 1%;
 `;
 
 const GridContainer = styled.div`
@@ -34,7 +34,7 @@ const CardContainer = styled.div`
 
 const TeamMember = () => {
   const [memberList, setMemberList] = useState([]);
-  
+
   const teamid = useRecoilValue(teamState);
 
   // 참여자 불러오기
@@ -59,13 +59,16 @@ const TeamMember = () => {
       console.log(memberList);
     });
   };
-
+  const reverse = [];
+  for (let i = memberList.length - 1; i >= 0; i--) {
+    reverse.push(memberList[i]);
+  }
   return (
     <Container>
       <h2>참여자 목록</h2>
       <MemberContainer>
         <GridContainer>
-          {memberList.map((member) => (
+          {reverse.map((member) => (
             <CardContainer key={member.userSeq}>
               <MemberBox member={member} />
             </CardContainer>

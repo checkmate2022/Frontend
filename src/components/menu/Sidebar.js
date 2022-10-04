@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { LeaderData, MypageData, TeamData } from './SidebarData';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
-import { useRecoilValue } from 'recoil';
+import { useRecoilSnapshot, useRecoilState, useRecoilValue } from 'recoil';
 import { leaderState, menuState, teamState } from '../../store/userstore';
 import ChannelAddModal from '../team/ChannelAddModal';
 import ChannelNavModal from './ChannelNavModal';
@@ -50,7 +50,7 @@ const StyledLi = styled.li`
 
 function Sidebar() {
   const teamId = useRecoilValue(teamState);
-  const menutype = useRecoilValue(menuState);
+  const [menutype, setMenuType] = useRecoilState(menuState);
 
   const [dataType, setDataType] = useState([]);
 
@@ -58,19 +58,9 @@ function Sidebar() {
   const [userId, setUserId] = useState('');
   const [leaderId, setLeaderId] = useState('');
 
-  // 팀장, 유저아이디 조회
-  // useEffect(() => {
-  //   if (menutype === 'team') {
-  //     onUserIdInfoGet(setUserId);
-  //     onTeamLeaderGet(setLeaderId, teamId);
-  //   }
-  // }, []);
-  console.log(userId, leaderId, userId === leaderId);
-
+  const location = useLocation();
   useEffect(() => {
-    if (menutype === 'mypage') {
-      setDataType(MypageData);
-    } else if (menutype === 'team') {
+    if (location.pathname.includes(`/team/${teamId}`)) {
       setLoading(true);
       onUserIdInfoGet(setUserId);
       onTeamLeaderGet(setLeaderId, teamId, setLoading);
@@ -79,10 +69,17 @@ function Sidebar() {
       } else {
         setDataType(TeamData);
       }
-    } else {
+      if (location.pathname.includes('meeting')) {
+        setDataType([]);
+      }
+    } else if (location.pathname === '/main') {
+      setDataType([]);
+    } else if (location.pathname === '/mypage') {
+      setDataType(MypageData);
+    } else if (location.pathname === '/team') {
       setDataType([]);
     }
-  }, [menutype, leaderId]);
+  }, [location, leaderId]);
 
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -123,8 +120,12 @@ function Sidebar() {
           </StyledUl>
         </StyledNav>
       </NavContainer>
-
-      {menutype === 'team' ? <ChannelAddModal teamId={teamId} /> : <></>}
+      {location.pathname.includes(`/team/${teamId}`) &&
+      !location.pathname.includes('newValueOrUpdater') ? (
+        <ChannelAddModal teamId={teamId} />
+      ) : (
+        <></>
+      )}
     </Container>
   );
 }

@@ -70,7 +70,7 @@ const Main = () => {
       <TextContainer>
         <MainText>
           Enjoy your avatar
-          <br /> meeting with <span>CLONE</span>.
+          <br /> meeting with <span>AvaTwin</span>.
         </MainText>
       </TextContainer>
       <PurpleContainer />

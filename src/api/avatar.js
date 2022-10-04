@@ -15,7 +15,6 @@ export const avatarAddapi = (avatarInfo, imgfile, createdfile) => {
 
   formData.append('originfile', imgfile);
   formData.append('createdfile', createdfile);
-
   formData.append('avatarName', avatarInfo.avatarName);
   formData.append('avatarDescription', avatarInfo.avatarDescription);
   formData.append('avatarStyle', avatarInfo.avatarStyle);
@@ -48,20 +47,20 @@ export const avatarChangeApi = (
   file,
   setCreatedfile,
   avatarInfo,
-  setCreatedPreview
+  setCreatedPreview,
+  setLoading
 ) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   var formData = new FormData();
 
   formData.append('file', file);
-
   formData.append('style', avatarInfo.style);
   formData.append('id', avatarInfo.id);
   formData.append('name', avatarInfo.name);
 
   console.log(formData);
-
+  setLoading(true);
   fetch('http://127.0.0.1:5000/aa', {
     method: 'POST',
     headers: {
@@ -75,6 +74,7 @@ export const avatarChangeApi = (
     .then((result) => {
       console.log(result);
       var image = window.URL.createObjectURL(result);
+
       console.log(image);
 
       const file = new File([result], 'image.png', { type: 'image/png' });
@@ -82,13 +82,14 @@ export const avatarChangeApi = (
       setCreatedfile(file);
 
       const reader = new FileReader();
-      reader.readAsDataURL(file);
 
+      reader.readAsDataURL(file);
       return new Promise((resolve) => {
         reader.onload = () => {
           // 미리보기 사진
           setCreatedPreview(reader.result);
           resolve();
+          setLoading(false);
         };
       });
     });
@@ -97,7 +98,6 @@ export const avatarChangeApi = (
 // 전체 아바타 조회
 export const onAvatarAllGet = (setAvatarList) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
-
   fetch(API_BASE_URL + '/api/v1/avatar', {
     method: 'GET',
     headers: {
@@ -136,5 +136,40 @@ export const onAvatarDelete = (id) => {
       } else {
         alert('다시 시도해주세요.');
       }
+    });
+};
+
+// 이모티콘 변환
+export const emoticonAdd = (file, setEmoticonList) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+  var formData = new FormData();
+  formData.append('file', file);
+  console.log(formData);
+  fetch('http://127.0.0.1:5000/anime', {
+    method: 'POST',
+    headers: {
+      //'Content-Type': 'multipart/form-data',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+    body: formData,
+  })
+    .then((res) => res.blob())
+    .then((result) => {
+      console.log(result);
+      var image = window.URL.createObjectURL(result);
+      console.log(image);
+      const file = new File([result], 'image.png', { type: 'image/png' });
+      console.log(file);
+      //setCreatedfile(file);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onload = () => {
+          // 미리보기 사진
+          //setCreatedPreview(reader.result);
+          resolve();
+        };
+      });
     });
 };

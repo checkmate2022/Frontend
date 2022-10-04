@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
 import { colors } from '../../styles/theme';
 import { onTeamMemberGet, onUserInfoGet } from '../../api/team';
+import { onUserIdInfoGet } from '../../api/auth';
 
 const customStyles = {
   content: {
@@ -72,6 +73,7 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [teamMember, setTeamMember] = useState('');
 
+  const [userId, setUserId] = useState('');
   // 검색 결과 리스트
   const [list, setList] = useState([]);
 
@@ -84,10 +86,17 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    onUserIdInfoGet(setUserId);
+    if (type === 'user' || type === 'useradd') {
+      onUserInfoGet(setList, teamMember);
+    }
+  }, []);
+
   // 검색
   const onSearch = () => {
-    if (type === 'user') {
-      onUserInfoGet(setList, teamMember);
+    if (type === 'user' || type === 'useradd') {
+      setList(list.filter((member) => member.userId !== userId));
     } else if (type === 'schedule') {
       onTeamMemberGet(setList, teamid);
     }
@@ -109,7 +118,7 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
 
   // 타입에 따라 출력 다르게
   const onTypeShow = (member) => {
-    if (type === 'user') {
+    if (type === 'user' || type === 'useradd') {
       return `${member.username}(${member.userId})`;
     } else if (type === 'schedule') {
       return `${member.username}`;
@@ -117,7 +126,7 @@ function MemberSearchModal({ memberList, setMemberList, type, teamid }) {
   };
 
   const deleteText = (member) => {
-    if (member.teamRoleType === 'MEMBER') {
+    if (member.teamRoleType === 'MEMBER' || type === 'useradd') {
       return (
         <SearchContainer>
           <DeleteText onClick={() => onRemove(member.userSeq)}>✖</DeleteText>

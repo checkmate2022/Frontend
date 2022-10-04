@@ -8,7 +8,6 @@ const Container = styled.div`
   width: 260px;
   height: 300px;
   background: ${colors.purple};
-  opacity: 0.7;
   border-radius: 48px;
   display: flex;
   flex-direction: column;

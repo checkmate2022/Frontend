@@ -50,9 +50,16 @@ const EditText = styled.span`
   margin-left: 8px;
 `;
 
+const EmoticonImg = styled.img`
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+`;
+
 function CommentList({ comment, boardId, onEdit, isEdit, resetIdx, userName }) {
   const [commentList, setCommentList] = useRecoilState(commentState);
   const [content, setContent] = useState(comment.content);
+  const [emoticonUrl, setEmoticonUrl] = useState('');
 
   // 댓글 수정
   const onCommentEditButton = (event) => {
@@ -82,6 +89,7 @@ function CommentList({ comment, boardId, onEdit, isEdit, resetIdx, userName }) {
             userImage={comment.userImage}
             content={content}
             onChange={(e) => setContent(e.target.value)}
+            setEmoticonUrl={setEmoticonUrl}
           />
           <EditContainer>
             <EditText onClick={resetIdx}>취소</EditText>
@@ -99,6 +107,9 @@ function CommentList({ comment, boardId, onEdit, isEdit, resetIdx, userName }) {
                 </NameText>
               </ProfileContainer>
               <NameText size={15}>{comment.content}</NameText>
+              {comment.emoticon !== '' && (
+                <EmoticonImg src={comment.emoticon} />
+              )}
             </div>
           </div>
           {userName === comment.username ? (

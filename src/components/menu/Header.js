@@ -72,7 +72,9 @@ function Header() {
       <Sidebar menutype={type} />
       <NavContainer>
         <div>
-          <h2>AvaTwin</h2>
+          <StyledLink to={'/main'}>
+            <h2>AvaTwin</h2>
+          </StyledLink>
         </div>
         <nav>
           <StyledUl>

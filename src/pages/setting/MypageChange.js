@@ -74,6 +74,8 @@ const Mypage = () => {
   // const [user, setUser] = useState([]);
   // const [password, setPassword] = useState('비밀번호');
 
+  const { state } = useLocation();
+
   const [idCheck, setIdCheck] = useState(false);
   const [nicknameCheck, setNicknameCheck] = useState(false);
 
@@ -90,7 +92,8 @@ const Mypage = () => {
 
   // 닉네임 중복확인
   const onCheckNickname = () => {
-    if (nickname !== '') {
+    // 빈칸이거나 이전 닉네임이랑 다를 시 중복 확인
+    if (nickname !== '' && nickname !== state.user.username) {
       onNickNameDoubleCheck(nickname, setNicknameCheck, setNickError);
     }
   };

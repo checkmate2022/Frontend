@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import PurpleButton from '../PurpleButton';
+import { BsEmojiSmile, BsXCircle } from 'react-icons/bs';
+import { useRecoilState } from 'recoil';
+import {
+  emoticonModalState,
+  selectedEmoticonState,
+} from '../../store/boardstore';
 
 const Container = styled.div`
   display: flex;
@@ -34,13 +40,46 @@ const StyledImage = styled.img`
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
   margin: 8px;
   width: 5%;
+  flex-direction: column;
 `;
 
-function CommentAdd({ userImage, onSubmit, content, onChange }) {
+const EmoticonImg = styled.img`
+  width: 100px;
+  height: 100px;
+  cursor: ${({ type }) => (type === 'edit' ? 'pointer' : 'auto')};
+`;
+
+const EmoticonContainer = styled.div`
+  position: absolute;
+  right: 9%;
+  // display: flex;
+  // flex-direction: row;
+  // justify-content: flex-end;
+`;
+
+const SelectedContainer = styled.div`
+  margin: 15px 0 0 55px;
+`;
+
+function CommentAdd({
+  userImage,
+  onSubmit,
+  content,
+  setEmoticonUrl,
+  onChange,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedEmoticon, setSelectedEmoticon] = useRecoilState(
+    selectedEmoticonState
+  );
+
+  const emoticonOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <form onSubmit={onSubmit}>
       <Container>
@@ -54,10 +93,72 @@ function CommentAdd({ userImage, onSubmit, content, onChange }) {
         />
         <ButtonContainer>
           <PurpleButton text='등록' />
+          <div style={{ height: '15px' }} />
+          <div>
+            <BsEmojiSmile style={iconstyle} onClick={emoticonOpen} />
+          </div>
         </ButtonContainer>
       </Container>
+      {selectedEmoticon !== '' && (
+        <SelectedContainer>
+          <EmoticonImg src={selectedEmoticon} />
+          <BsXCircle
+            style={deleteiconStyle}
+            onClick={() => setSelectedEmoticon('')}
+          />
+        </SelectedContainer>
+      )}
+
+      {isOpen && (
+        <EmoticonContainer>
+          {imgsrc.map((img) => (
+            <EmoticonImg
+              key={img.id}
+              src={img.src}
+              type='edit'
+              onClick={() => {
+                setEmoticonUrl(img.src);
+                setSelectedEmoticon(img.src);
+                setIsOpen(false);
+              }}
+            />
+          ))}
+        </EmoticonContainer>
+      )}
     </form>
   );
 }
+
+let imgsrc = [
+  {
+    id: 0,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry_melon.png',
+  },
+  {
+    id: 1,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy_melon.png',
+  },
+  {
+    id: 2,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad_melon.png',
+  },
+  {
+    id: 3,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink_melon.png',
+  },
+];
+
+const iconstyle = {
+  cursor: 'pointer',
+  width: '30px',
+  height: '30px',
+};
+
+const deleteiconStyle = {
+  cursor: 'pointer',
+  width: '15px',
+  height: '15px',
+  position: 'absolute',
+};
 
 export default CommentAdd;

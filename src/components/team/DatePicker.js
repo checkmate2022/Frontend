@@ -2,8 +2,18 @@ import React from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/esm/locale';
+import 'moment/locale/ko';
 
-function Datepicker({ selected, onChange, customInput, minDate, maxDate }) {
+function Datepicker({
+  selected,
+  onChange,
+  customInput,
+  minDate,
+  maxDate,
+  minTime,
+  maxTime,
+  filterTime,
+}) {
   return (
     <div>
       <ReactDatePicker
@@ -18,6 +28,9 @@ function Datepicker({ selected, onChange, customInput, minDate, maxDate }) {
         customInput={customInput}
         minDate={minDate}
         maxDate={maxDate}
+        minTime={minTime}
+        maxTime={maxTime}
+        filterTime={filterTime}
       />
     </div>
   );
