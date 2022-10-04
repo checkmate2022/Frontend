@@ -11,7 +11,12 @@ import {
   onBoardGet,
 } from '../../api/teamboard';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { channelState, commentState } from '../../store/boardstore';
+import {
+  channelState,
+  commentState,
+  emoticonModalState,
+  selectedEmoticonState,
+} from '../../store/boardstore';
 import { onUsernameInfoGet } from '../../api/auth';
 
 const Container = styled.div`
@@ -89,6 +94,10 @@ const TeamBoard = () => {
   const [content, setContent] = useState('');
   const [commentList, setCommentList] = useRecoilState(commentState);
   const [selectedIdx, setSelectedIdx] = useState();
+  const [emoticonUrl, setEmoticonUrl] = useState('');
+  const [selectedEmoticon, setSelectedEmoticon] = useRecoilState(
+    selectedEmoticonState
+  );
 
   // 게시글 정보
   const [board, setBoard] = useState([]);
@@ -106,8 +115,10 @@ const TeamBoard = () => {
   // 댓글 등록
   const onCommentAddButton = (event) => {
     event.preventDefault();
-    onCommentAdd(boardId, content, setCommentList);
+    onCommentAdd(boardId, content, emoticonUrl, setCommentList);
     setContent('');
+    setEmoticonUrl('');
+    setSelectedEmoticon('');
   };
 
   useEffect(() => {
@@ -150,8 +161,11 @@ const TeamBoard = () => {
         <h3>댓글</h3>
         <CommentAdd
           onSubmit={onCommentAddButton}
-          userImage={board.userImage}
+          userImage={
+            'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/avatar/melon.png'
+          }
           content={content}
+          setEmoticonUrl={setEmoticonUrl}
           onChange={(e) => setContent(e.target.value)}
         />
         <ClistContainer>

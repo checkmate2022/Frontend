@@ -16,6 +16,7 @@ import { teamState, userState } from '../../store/userstore';
 import { onUserInfoGet } from '../../api/auth';
 import Loading from '../Loading';
 import { onCreateSession } from '../../api/meeting';
+import { onAvatarAllGet } from '../../api/avatar';
 
 const customStyles = {
   content: {
@@ -60,7 +61,7 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
   console.log(devices);
 
   // 아바타 스타일
-  const [avatarList, setAvatarList] = useState(avatardata);
+  const [avatarList, setAvatarList] = useState([]);
   const [avatarStyle, setAvatarStyle] = useState(undefined);
 
   // 내 정보
@@ -69,7 +70,7 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
 
   // 아바타 불러오기
   useEffect(() => {
-    //onAvatarAllGet(setAvatarList);
+    onAvatarAllGet(setAvatarList);
   }, []);
 
   // 내 정보 불러오기

@@ -6,6 +6,7 @@ import { Tooltip } from '@material-ui/core';
 import './ChattingBar.css';
 import { colors } from '../../styles/theme';
 import ChatContent from './ChatContent';
+import { BsEmojiSmile } from 'react-icons/bs';
 
 const Container = styled.div`
   position: absolute;
@@ -47,7 +48,6 @@ const ChatContainer = styled.div`
 `;
 
 const StyledInput = styled.input`
-  width: ${({ typestyle }) => (typestyle === 'date' ? 'fit-content' : '60%')};
   height: 20px;
   opacity: 0.9;
   background: ${colors.white};
@@ -62,9 +62,34 @@ const StyledInput = styled.input`
   }
 `;
 
-const ChatImg = styled.img`
+const EmoticonsContainer = styled.div`
+  position: absolute;
+  right: 120px;
   width: 100%;
   height: 100%;
+  top: 0px;
+  background-color: ${colors.white};
+`;
+
+const IconContainer = styled.div`
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+`;
+
+const EmoticonImg = styled.img`
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  border-radius: 10px;
+`;
+
+const EmoticonContainer = styled.div`
+  position: absolute;
+  left: 10px;
+  top: 0px;
+  margin: auto;
+  box-shadow: none !important;
 `;
 
 function ChattingBar({ session, streamManager, userName }) {
@@ -73,37 +98,30 @@ function ChattingBar({ session, streamManager, userName }) {
 
   const chatScroll = useRef();
   console.log('streamManager', streamManager);
+  //console.log('streamManager.session', streamManager.session);
   console.log('session', session);
   console.log('messageList', messageList);
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const emoticonOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   useEffect(() => {
-    session.on('signal:chat', (event) => {
-      const data = JSON.parse(event.data);
-      console.log('실행이 왜 안되냐');
-      console.log('event.from', event.from);
-      console.log('data', data);
-      console.log('streamManager', streamManager);
-      console.log('connectionId', event.from.connectionId);
-      setMessageList((prev) => [...prev, data]);
-      // let newmessageList = messageList;
-      // newmessageList.push({
-      //   // connectionId: data.streamId,
-      //   nickname: data.nickname,
-      //   message: data.message,
-      // });
-      // const document = window.document;
-      // setTimeout(() => {
-      //   const userImg = document.getElementById(
-      //     'userImg-' + (newmessageList.length - 1)
-      //   );
-      //   const video = document.getElementById('video-' + data.streamId);
-      //   const avatar = userImg.getContext('2d');
-      //   avatar.drawImage(video, 200, 120, 285, 285, 0, 0, 60, 60);
-      // }, 50);
-      // setMessageList(newmessageList);
-      scrollToBottom();
-    });
-  }, []);
+    if (streamManager) {
+      streamManager.session.on('signal:chat', (event) => {
+        const data = JSON.parse(event.data);
+
+        setMessageList((prev) => [...prev, data]);
+
+        // let newmessageList = messageList;
+        // newmessageList.push(data);
+        // setMessageList(newmessageList);
+        // scrollToBottom();
+      });
+    }
+  }, [streamManager]);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -139,10 +157,29 @@ function ChattingBar({ session, streamManager, userName }) {
     session.signal({
       data: JSON.stringify({
         id: `${userName}${Date.now()}`,
-        message,
+        message: message,
+        time: time,
+        userName: userName,
+      }),
+      type: 'chat',
+    });
+    setMessage('');
+  };
+
+  // 이모티콘 보내기
+  const sendEmoticon = (src) => {
+    console.log(message);
+    const time = new Date().toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    session.signal({
+      data: JSON.stringify({
+        id: `${userName}${Date.now()}`,
+        message: '',
         time,
         userName: userName,
-        img: 'https://image.jtbcplus.kr/data/contents/jam_photo/202002/07/3e4bc737-0d46-44c7-a169-95277ea2357c.jpg',
+        img: src,
       }),
       type: 'chat',
     });
@@ -164,23 +201,26 @@ function ChattingBar({ session, streamManager, userName }) {
           <span>채팅</span>
         </ChatToolbar>
         <ChatContainer ref={chatScroll}>
-          {/* {messageList.map((data, i) => (
-            <div key={i} id='remoteUsers'>
-              <div className='msg-detail'>
-                <div className='msg-info'>
-                  <p> {data.nickname}</p>
-                </div>
-                <div className='msg-content'>
-                  <span className='triangle' />
-                  <p className='text'>{data.message}</p>
-                  <ChatImg src={data.img} />
-                </div>
-              </div>
-            </div>
-          ))} */}
           <ChatContent chats={messageList} scrollToBottom={scrollToBottom} />
         </ChatContainer>
-
+        <EmoticonContainer>
+          <div>
+            <IconContainer>
+              <BsEmojiSmile style={iconstyle} onClick={emoticonOpen} />
+            </IconContainer>
+            {isOpen && (
+              <EmoticonsContainer>
+                {imgsrc.map((img) => (
+                  <EmoticonImg
+                    key={img.id}
+                    src={img.src}
+                    onClick={() => sendEmoticon(img.src)}
+                  />
+                ))}
+              </EmoticonsContainer>
+            )}
+          </div>
+        </EmoticonContainer>
         <div id='messageInput'>
           <StyledInput
             placeholder='메세지를 입력하세요'
@@ -199,5 +239,30 @@ function ChattingBar({ session, streamManager, userName }) {
     </Container>
   );
 }
+
+let imgsrc = [
+  {
+    id: 0,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry.png',
+  },
+  {
+    id: 1,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy.png',
+  },
+  {
+    id: 2,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad.png',
+  },
+  {
+    id: 3,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink.png',
+  },
+];
+
+const iconstyle = {
+  cursor: 'pointer',
+  width: '30px',
+  height: '30px',
+};
 
 export default ChattingBar;

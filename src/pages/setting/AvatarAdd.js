@@ -8,21 +8,19 @@ import {
   PhotoUploader,
   PurpleButton,
   GreyLabel,
+  Loading,
 } from '../../components';
-import { avatarAddapi, avatarChangeApi } from '../../api/avatar';
-
+import { avatarAddapi, avatarChangeApi, emoticonAdd } from '../../api/avatar';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 11% 0 3% 6%;
 `;
-
 const LabelContainer = styled.div`
   display: flex;
   width: fit-content;
 `;
-
 const StyledInput = styled.input`
   width: ${({ width }) => (width === 'disabled' ? 290 : 100)}px;
   height: 6px;
@@ -32,12 +30,10 @@ const StyledInput = styled.input`
   font-size: 14px;
   padding: 12px;
   margin-right: 5px;
-
   &:focus {
     outline: 0.3px solid ${colors.purple};
   }
 `;
-
 const StyledTextArea = styled.textarea`
   width: 500px;
   height: 55px;
@@ -52,7 +48,6 @@ const StyledTextArea = styled.textarea`
     outline: 0.3px solid ${colors.purple};
   }
 `;
-
 const ImgContainer = styled.div`
   overflow: hidden;
   width: 184px;
@@ -61,6 +56,12 @@ const ImgContainer = styled.div`
   border: 1px solid ${colors.grey2};
   border-radius: 15px;
   margin-bottom: 3%;
+`;
+
+const EmoticonImg = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
 `;
 
 const AvatarAdd = () => {
@@ -75,8 +76,18 @@ const AvatarAdd = () => {
   const [createdfile, setCreatedfile] = useState(null);
   const [createdPreview, setCreatedPreview] = useState(null);
 
+  // 이모티콘 리스트
+  const [emoticonList, setEmoticonList] = useState([]);
+
   // 라디오 버튼
-  const avatarStyles = ['cartoon', 'caricature', 'anime', 'arcane', 'pixar'];
+  const avatarStyles = [
+    'cartoon',
+    'caricature',
+    'anime',
+    'arcane',
+    'pixar',
+    '여신강림',
+  ];
   const onClickRadioButton = (e) => {
     setAvatarStyle(e.target.value);
   };
@@ -84,7 +95,7 @@ const AvatarAdd = () => {
   // 화면 캡쳐 & 사진 미리보기
   const [imgSrc, setImgSrc] = useState(null);
   const [imgName, setImgName] = useState('');
-
+  const [loading, setLoading] = useState(false);
   // 사진 삭제
   const onDeleteImg = () => {
     setImgName('');
@@ -93,10 +104,13 @@ const AvatarAdd = () => {
   };
 
   // 아바타 이름 중복확인
-  const onCheckName = () => {};
 
+  const onCheckName = () => {};
   // 아바타 변형(flask)
   const onAvatarChange = () => {
+    if (avatarStyle === '여신강림') {
+      setAvatarStyle('webtoon');
+    }
     avatarChangeApi(
       imgfile,
       setCreatedfile,
@@ -105,10 +119,10 @@ const AvatarAdd = () => {
         style: avatarStyle,
         name: avatarName,
       },
-      setCreatedPreview
+      setCreatedPreview,
+      setLoading
     );
   };
-
   // 아바타 등록
   const onAvatarAdd = () => {
     avatarAddapi(
@@ -123,10 +137,27 @@ const AvatarAdd = () => {
     );
   };
 
+  // 이모티콘 생성
+  const onEmoticonAdd = () => {
+    emoticonAdd(createdfile, setEmoticonList);
+  };
+
+  // 로딩 딜레이
+  const [isEmoticonLoading, setIsEmoticonLoading] = useState(false);
+  const [isEmoticon, setIsEmoticon] = useState(false);
+  const onLoading = () => {
+    setIsEmoticonLoading(true);
+    setTimeout(() => {
+      setIsEmoticonLoading(false);
+      setIsEmoticon(true);
+    }, 2000);
+  };
+
   console.log(createdfile);
 
   return (
     <Container>
+      {loading ? <Loading /> : null}
       <div style={{ display: 'flex' }}>
         <div>
           <GreyLabel text='사진 업로드' />
@@ -196,22 +227,37 @@ const AvatarAdd = () => {
         value={styleNum}
         onChange={(e) => SetStyleNum(e.target.value)}
       />
-
       <div
         style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+      ></div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginTop: '5%',
+          flexDirection: 'column',
+        }}
       >
         <GreyButton
-          text='아바타로 변형하기'
+          text='아바타 생성'
           type='button'
           onClick={() => onAvatarChange()}
           width='400px'
           height='40px'
         />
-      </div>
-      <div
-        style={{ display: 'flex', justifyContent: 'center', marginTop: '5%' }}
-      >
         <img src={createdPreview} style={{ width: '25%', height: '25%' }} />
+        {isEmoticonLoading ? <Loading /> : null}
+        {createdPreview && (
+          <GreyButton
+            text='이모티콘 생성'
+            type='button'
+            onClick={onLoading}
+            width='400px'
+            height='40px'
+          />
+        )}
+        {isEmoticon &&
+          emoticonList.map((emoticon) => <EmoticonImg src={emoticon.src} />)}
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <PurpleButton text='완료' onClick={onAvatarAdd} />
@@ -219,8 +265,28 @@ const AvatarAdd = () => {
       <img alt='cartoon' src='images/cartoon_style.png' />
       <img alt='caricature' src='images/caricature_style.png' />
       <img alt='anime' src='images/anime_style.png' />
+      <img alt='webtoon' src='images/webtoon_style.png' />
     </Container>
   );
 };
+
+let imgsrc = [
+  {
+    id: 0,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry.png',
+  },
+  {
+    id: 1,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy.png',
+  },
+  {
+    id: 2,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad.png',
+  },
+  {
+    id: 3,
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink.png',
+  },
+];
 
 export default AvatarAdd;

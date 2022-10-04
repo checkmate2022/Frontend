@@ -9,7 +9,6 @@ const Container = styled.div`
   height: 320px;
   background: ${({ add }) =>
     add ? colors.avatarcolor[2] : colors.avatarcolor[0]};
-  opacity: 0.5;
   border-radius: 48px;
   display: flex;
   flex-direction: column;
@@ -123,7 +122,7 @@ function AvatarType({ avatar, add }) {
           {avatar ? <GreyLabel text='기본' /> : <></>}
         </div> */}
         {avatar.map((item) => (
-          <Container key={item[`@id`]}>
+          <Container key={item.avatarSeq}>
             <ImgContainer>
               <StyledImg src={item.avatarCreatedUrl} />
               <NameText>{item.avatarName}</NameText>
@@ -135,7 +134,7 @@ function AvatarType({ avatar, add }) {
               <StyledText>캐릭터 설명: {item.avatarDescription}</StyledText>
             </DetailContainer>
             <ButtonContainer>
-              <TextButton onClick={() => onDelete(item[`@id`])}>
+              <TextButton onClick={() => onDelete(item.avatarSeq)}>
                 삭제
               </TextButton>
               <TextButton onClick={onChange}>수정</TextButton>
