@@ -18,3 +18,8 @@ export const commentState = atom({
   key: 'commentState',
   default: [],
 });
+
+export const selectedEmoticonState = atom({
+  key: 'selectedEmoticonState',
+  default: '',
+});
