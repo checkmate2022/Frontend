@@ -147,6 +147,7 @@ const AvatarAdd = () => {
   const [isEmoticon, setIsEmoticon] = useState(false);
   const onLoading = () => {
     setIsEmoticonLoading(true);
+    onEmoticonAdd();
     setTimeout(() => {
       setIsEmoticonLoading(false);
       setIsEmoticon(true);
