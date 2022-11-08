@@ -131,3 +131,25 @@ export const onScheduleDelete = (teamid, scheduleId) => {
       }
     });
 };
+
+// 단건 일정 조회
+export const onScheduleGet = (scheduleId, setSchedule) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+
+  fetch(API_BASE_URL + `/api/v1/schedule/${scheduleId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        const data = result.data;
+        console.log(result);
+        setSchedule(data);
+      }
+    });
+};

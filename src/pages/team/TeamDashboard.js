@@ -4,6 +4,7 @@ import { colors } from '../../styles/theme';
 import {
   PurpleButton,
   JoinMeetingModal,
+  ScheduleDetail,
   CalendarDate,
 } from '../../components/index';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -13,9 +14,8 @@ import ReactCalendar from 'react-calendar';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import '../../components/team/Calendar.css';
-import { checkafternow } from '../../module/time';
+import { checkafternow, formatDay } from '../../module/time';
 import { meetingState } from '../../store/meetingstore';
-import { onTeamLeaderGet } from '../../api/team';
 
 const Container = styled.div`
   display: flex;
@@ -39,6 +39,11 @@ const ButtonContainer = styled.div`
   align-items: flex-end;
 `;
 
+const AbsoluteContainer = styled.div`
+  position: absolute;
+  margin: 1% 0 0 3%;
+`;
+
 const TeamDashboard = () => {
   const teamid = useRecoilValue(teamState);
   const setMeeting = useSetRecoilState(meetingState);
@@ -52,9 +57,21 @@ const TeamDashboard = () => {
   // 회의 설정 모달
   const [modalIsOpen, setIsOpen] = useState(false);
 
+  // 일정 상세 모달
+  const [detailModalIsOpen, setDetailModalIsOpen] = useState(false);
+
+  // 선택 날짜
+  const [selectedDate, setSelectedDate] = useState('');
+
   const openModal = (item) => {
     setIsOpen(true);
     setMeeting(item);
+  };
+
+  // 일정 상세 모달
+  const openDetailModal = (item) => {
+    setDetailModalIsOpen(true);
+    setSelectedDate(item);
   };
 
   // 회의/일정 등록 페이지 이동
@@ -133,43 +150,47 @@ const TeamDashboard = () => {
       <TitleText>일정</TitleText>
       <ReactCalendar
         showNeighboringMonth={false}
-        //onChange={(e) => console.log(e)}
+        formatDay={(locale, date) => formatDay(date)}
+        minDetail='month' // 상단 네비게이션에서 '월' 단위만 보이게 설정
+        maxDetail='month' // 상단 네비게이션에서 '월' 단위만 보이게 설정
+        navigationLabel={null}
+        onChange={(e) => setSelectedDate(moment(e).format('YYYY-MM-DD'))}
         tileContent={({ date, view }) => {
-          if (
-            scheduleList.find(
-              (x) =>
-                moment(x.scheduleStartDate).format('YYYY-MM-DD') ===
-                moment(date).format('YYYY-MM-DD')
-            )
-          ) {
+          let html = [];
+          let check = scheduleList.filter(
+            (x) =>
+              moment(x.scheduleStartDate).format('YYYY-MM-DD') ===
+              moment(date).format('YYYY-MM-DD')
+          );
+
+          check.map((item) => {
+            html.push(
+              <div
+                key={item.scheduleSeq}
+                style={{ cursor: 'pointer', fontWeight: 'bold' }}
+                onClick={() => openDetailModal(item.scheduleSeq)}
+              >
+                {item.scheduleName}
+              </div>
+            );
+          });
+
+          if (check !== []) {
             return (
               <>
-                <div className='flex justify-center items-center absoluteDiv'>
-                  <div className='dot'></div>
-                  <CalendarDate scheduleList={dateList} />
-                </div>
+                <AbsoluteContainer>{html}</AbsoluteContainer>
               </>
             );
           }
         }}
-        onClickDay={(day) => {
-          let list = [];
-
-          scheduleList.map((item) => {
-            if (
-              moment(item.scheduleStartDate).format('YYYY-MM-DD') ===
-              moment(day).format('YYYY-MM-DD')
-            ) {
-              list.push(item);
-            }
-          });
-
-          setDateList(list);
-
-          ///console.log(list);
-        }}
       />
-      <CalendarDate scheduleList={dateList} />
+      {detailModalIsOpen ? (
+        <ScheduleDetail
+          scheduleId={selectedDate}
+          modalIsOpen={detailModalIsOpen}
+          setIsOpen={setDetailModalIsOpen}
+        />
+      ) : null}
     </Container>
   );
 };
