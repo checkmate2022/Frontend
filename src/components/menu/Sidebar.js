@@ -61,7 +61,7 @@ function Sidebar() {
   const location = useLocation();
   useEffect(() => {
     if (location.pathname.includes(`/team/${teamId}`)) {
-      setLoading(true);
+      //setLoading(true);
       onUserIdInfoGet(setUserId);
       onTeamLeaderGet(setLeaderId, teamId, setLoading);
       if (userId === leaderId) {
@@ -78,6 +78,8 @@ function Sidebar() {
       setDataType(MypageData);
     } else if (location.pathname === '/team') {
       setDataType([]);
+    } else if (location.pathname === '/avataradd') {
+      setDataType(MypageData);
     }
   }, [location, leaderId]);
 

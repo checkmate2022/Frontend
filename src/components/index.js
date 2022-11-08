@@ -23,6 +23,7 @@ import Pagination from './team/Pagination';
 import SocialLogin from './auth/SocialLogin';
 import ChattingBar from './meeting/ChattingBar';
 import ChatContent from './meeting/ChatContent';
+import ScheduleDetail from './team/ScheduleDetail';
 
 export {
   AuthButton,
@@ -50,4 +51,5 @@ export {
   SocialLogin,
   ChattingBar,
   ChatContent,
+  ScheduleDetail,
 };

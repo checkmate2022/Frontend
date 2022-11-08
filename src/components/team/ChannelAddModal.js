@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
 import { colors } from '../../styles/theme';
 import PurpleButton from '../PurpleButton';
-import { onChannelAdd } from '../../api/teamboard';
+import {
+  onChannelAdd,
+  onChannelChange,
+  onChannelDelete,
+  onChannelGet,
+} from '../../api/teamboard';
 
 const customStyles = {
   content: {
@@ -19,8 +24,8 @@ const customStyles = {
 
 const StyledInput = styled.input`
   position: relative;
-  width: 60%;
-  height: 20px;
+  width: 50%;
+  height: 10px;
   opacity: 0.9;
   background: ${colors.white};
   border: 1px solid ${colors.grey2};
@@ -60,12 +65,14 @@ const RowContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  margin: 10px 0 20px 0;
+  margin: 10px 0 10px 0;
 `;
 
 function ChannelAddModal({ teamId }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [channelName, setChannelName] = useState('');
+  const [channelList, setChannelList] = useState([]);
+  const [changeName, setChangeName] = useState('');
 
   const openModal = () => {
     setIsOpen(true);
@@ -75,8 +82,28 @@ function ChannelAddModal({ teamId }) {
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    ChannelGet();
+  }, []);
+
+  // 채널 불러오기
+  const ChannelGet = () => {
+    onChannelGet(teamId, setChannelList);
+  };
+
+  // 채널 추가
   const onChannelAddButton = () => {
     onChannelAdd(teamId, channelName);
+  };
+
+  // 채널 수정
+  const onChannelChangeButton = (id) => {
+    onChannelChange(id, changeName);
+  };
+
+  // 채널 삭제
+  const onChannelDeleteButton = (id) => {
+    onChannelDelete(teamId, id);
   };
 
   return (
@@ -92,16 +119,33 @@ function ChannelAddModal({ teamId }) {
           onRequestClose={closeModal}
         >
           <ModalContainer>
-            <h2>게시판 추가</h2>
+            <h2>게시판 관리</h2>
+            {channelList.map((item) => (
+              <RowContainer>
+                <div style={{ width: '25px' }} />
+                <span>{item.channelName}</span>
+                <div style={{ width: '110px' }} />
+                <PurpleButton
+                  text='변경'
+                  onClick={() => onChannelChangeButton(item.channelSeq)}
+                />
+                <div style={{ width: '7px' }} />
+                <PurpleButton
+                  text='삭제'
+                  onClick={() => onChannelDeleteButton(item.channelSeq)}
+                />
+              </RowContainer>
+            ))}
+
             <RowContainer>
               <span>게시판 이름</span>
               <StyledInput
                 value={channelName}
                 onChange={(e) => setChannelName(e.target.value)}
               />
+              <div style={{ width: '7px' }} />
+              <PurpleButton text='등록' onClick={onChannelAddButton} />
             </RowContainer>
-
-            <PurpleButton text='등록' onClick={onChannelAddButton} />
           </ModalContainer>
         </Modal>
       </div>

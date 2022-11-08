@@ -53,3 +53,13 @@ export const changeEndDateData = (date) => {
 
   return res;
 };
+
+// 달력 일 format
+export const formatDay = (date) => {
+  let fdate = moment(date).format('DD');
+  if (fdate[0] === '0') {
+    fdate = fdate[1];
+  }
+
+  return fdate;
+};

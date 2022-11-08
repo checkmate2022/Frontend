@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import {
@@ -57,13 +57,11 @@ const ImgContainer = styled.div`
   border-radius: 15px;
   margin-bottom: 3%;
 `;
-
 const EmoticonImg = styled.img`
   width: 100px;
   height: 100px;
   border-radius: 10px;
 `;
-
 const AvatarAdd = () => {
   // 서버로 보낼 데이터
   const [imgfile, setImgfile] = useState(null);
@@ -71,14 +69,11 @@ const AvatarAdd = () => {
   const [detail, setDetail] = useState('');
   const [avatarStyle, setAvatarStyle] = useState('');
   const [styleNum, SetStyleNum] = useState('');
-
   // 변환된 사진 & 사진 미리보기
   const [createdfile, setCreatedfile] = useState(null);
   const [createdPreview, setCreatedPreview] = useState(null);
-
   // 이모티콘 리스트
   const [emoticonList, setEmoticonList] = useState([]);
-
   // 라디오 버튼
   const avatarStyles = [
     'cartoon',
@@ -91,7 +86,6 @@ const AvatarAdd = () => {
   const onClickRadioButton = (e) => {
     setAvatarStyle(e.target.value);
   };
-
   // 화면 캡쳐 & 사진 미리보기
   const [imgSrc, setImgSrc] = useState(null);
   const [imgName, setImgName] = useState('');
@@ -102,9 +96,7 @@ const AvatarAdd = () => {
     setImgSrc(null);
     setImgfile('');
   };
-
   // 아바타 이름 중복확인
-
   const onCheckName = () => {};
   // 아바타 변형(flask)
   const onAvatarChange = () => {
@@ -136,12 +128,10 @@ const AvatarAdd = () => {
       createdfile
     );
   };
-
   // 이모티콘 생성
   const onEmoticonAdd = () => {
     emoticonAdd(createdfile, setEmoticonList);
   };
-
   // 로딩 딜레이
   const [isEmoticonLoading, setIsEmoticonLoading] = useState(false);
   const [isEmoticon, setIsEmoticon] = useState(false);
@@ -153,9 +143,7 @@ const AvatarAdd = () => {
       setIsEmoticon(true);
     }, 2000);
   };
-
   console.log(createdfile);
-
   return (
     <Container>
       {loading ? <Loading /> : null}
@@ -246,7 +234,9 @@ const AvatarAdd = () => {
           width='400px'
           height='40px'
         />
+        <div style={{ height: '20px' }} />
         <img src={createdPreview} style={{ width: '25%', height: '25%' }} />
+        <div style={{ height: '20px' }} />
         {isEmoticonLoading ? <Loading /> : null}
         {createdPreview && (
           <GreyButton
@@ -270,7 +260,6 @@ const AvatarAdd = () => {
     </Container>
   );
 };
-
 let imgsrc = [
   {
     id: 0,
@@ -289,5 +278,4 @@ let imgsrc = [
     src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink.png',
   },
 ];
-
 export default AvatarAdd;

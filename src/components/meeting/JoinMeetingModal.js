@@ -61,7 +61,7 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
   console.log(devices);
 
   // 아바타 스타일
-  const [avatarList, setAvatarList] = useState([]);
+  const [avatarList, setAvatarList] = useState(avatardata);
   const [avatarStyle, setAvatarStyle] = useState(undefined);
 
   // 내 정보
@@ -147,6 +147,7 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
       //window.location.href = `/team/${teamId}/meeting/${meetingId}`;
       navigate(`/team/${teamId}/meeting/${meetingId}`);
     }
+    navigate(`/team/${teamId}/meeting/${meetingId}`);
   };
 
   return (
@@ -203,39 +204,29 @@ const iconstyle = {
 const avatardata = [
   {
     avatarSeq: 1,
-    avatarName: '아바타1',
-    avatarDescription: 'string',
+    avatarName: 'na',
+    avatarDescription: 'ss',
     avatarOriginUrl: 'string',
-    avatarCreatedUrl: 'string',
+    avatarCreatedUrl:
+      'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/avatar/jj.png',
     avatarStyle: 'cartoon',
     avatarStyleId: 35,
-    avatarDate: '2022-07-26T09:03:26.955Z',
+    avatarDate: '2022-10-04T07:50:26.955Z',
     isBasic: true,
     '@id': 1,
   },
   {
     avatarSeq: 2,
-    avatarName: '아바타2',
-    avatarDescription: 'string',
+    avatarName: 'jamong',
+    avatarDescription: 'ss',
     avatarOriginUrl: 'string',
-    avatarCreatedUrl: 'string',
+    avatarCreatedUrl:
+      'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/avatar/jamong.png',
     avatarStyle: 'cartoon',
     avatarStyleId: 35,
-    avatarDate: '2022-07-26T09:03:26.955Z',
+    avatarDate: '2022-10-04T07:52:26.955Z',
     isBasic: true,
     '@id': 2,
-  },
-  {
-    avatarSeq: 3,
-    avatarName: '아바타3',
-    avatarDescription: 'string',
-    avatarOriginUrl: 'string',
-    avatarCreatedUrl: 'string',
-    avatarStyle: 'cartoon',
-    avatarStyleId: 35,
-    avatarDate: '2022-07-26T09:03:26.955Z',
-    isBasic: true,
-    '@id': 3,
   },
 ];
 
