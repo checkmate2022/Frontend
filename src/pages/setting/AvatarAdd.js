@@ -135,14 +135,7 @@ const AvatarAdd = () => {
   // 로딩 딜레이
   const [isEmoticonLoading, setIsEmoticonLoading] = useState(false);
   const [isEmoticon, setIsEmoticon] = useState(false);
-  const onLoading = () => {
-    setIsEmoticonLoading(true);
-    onEmoticonAdd();
-    setTimeout(() => {
-      setIsEmoticonLoading(false);
-      setIsEmoticon(true);
-    }, 2000);
-  };
+
   console.log(createdfile);
   return (
     <Container>
@@ -242,13 +235,13 @@ const AvatarAdd = () => {
           <GreyButton
             text='이모티콘 생성'
             type='button'
-            onClick={onLoading}
+            onClick={onEmoticonAdd}
             width='400px'
             height='40px'
           />
         )}
         {isEmoticon &&
-          emoticonList.map((emoticon) => <EmoticonImg src={emoticon.src} />)}
+          emoticonList.map((emoticon) => <EmoticonImg src={emoticon} />)}
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <PurpleButton text='완료' onClick={onAvatarAdd} />

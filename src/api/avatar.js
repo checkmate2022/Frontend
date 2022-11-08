@@ -142,8 +142,9 @@ export const onAvatarDelete = (id) => {
 };
 
 // 이모티콘 변환
-export const emoticonAdd = (file, setEmoticonList) => {
+export const emoticonAdd = (file, setEmoticonList, setIsEmoticonLoading) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
+  setIsEmoticonLoading(true);
   var formData = new FormData();
   formData.append('file', file);
   console.log(formData);
@@ -158,11 +159,9 @@ export const emoticonAdd = (file, setEmoticonList) => {
   })
     .then((res) => res.json())
     .then((result) => {
-      if (result.success) {
-        alert('아바타가 삭제되었습니다.');
-        window.location.reload();
-      } else {
-        alert('다시 시도해주세요.');
+      if (result) {
+        setIsEmoticonLoading(false);
+        setEmoticonList(result);
       }
     });
 };
