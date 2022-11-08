@@ -7,6 +7,7 @@ import './ChattingBar.css';
 import { colors } from '../../styles/theme';
 import ChatContent from './ChatContent';
 import { BsEmojiSmile } from 'react-icons/bs';
+import { onEmoticonGet } from '../../api/avatar';
 
 const Container = styled.div`
   position: absolute;
@@ -95,6 +96,13 @@ const EmoticonContainer = styled.div`
 function ChattingBar({ session, streamManager, userName }) {
   const [messageList, setMessageList] = useState([]);
   const [message, setMessage] = useState('');
+
+  const [emoticonList, setEmoticonList] = useState([]);
+
+  // 이모티콘 불러오기
+  useEffect(() => {
+    onEmoticonGet(setEmoticonList);
+  }, []);
 
   const chatScroll = useRef();
   console.log('streamManager', streamManager);
@@ -210,11 +218,11 @@ function ChattingBar({ session, streamManager, userName }) {
             </IconContainer>
             {isOpen && (
               <EmoticonsContainer>
-                {imgsrc.map((img) => (
+                {emoticonList.map((img, index) => (
                   <EmoticonImg
-                    key={img.id}
-                    src={img.src}
-                    onClick={() => sendEmoticon(img.src)}
+                    key={index}
+                    src={img}
+                    onClick={() => sendEmoticon(img)}
                   />
                 ))}
               </EmoticonsContainer>
@@ -240,22 +248,23 @@ function ChattingBar({ session, streamManager, userName }) {
   );
 }
 
+// 임시 테스트 데이터
 let imgsrc = [
   {
     id: 0,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry.png',
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry_jamong.png',
   },
   {
     id: 1,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy.png',
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy_jamong.png',
   },
   {
     id: 2,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad.png',
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad_jamong.png',
   },
   {
     id: 3,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink.png',
+    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink_jamong.png',
   },
 ];
 

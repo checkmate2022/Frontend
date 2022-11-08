@@ -58,7 +58,6 @@ export const avatarChangeApi = (
   formData.append('style', avatarInfo.style);
   formData.append('id', avatarInfo.id);
   formData.append('name', avatarInfo.name);
-
   console.log(formData);
   setLoading(true);
   fetch('http://127.0.0.1:5000/aa', {
@@ -70,19 +69,22 @@ export const avatarChangeApi = (
     },
     body: formData,
   })
-    .then((res) => res.blob())
+    .then((res) => {
+      if (res.status === 200) {
+        return res.blob();
+      } else {
+        alert('다른 사진을 첨부해주세요!');
+        setLoading(false);
+      }
+    })
     .then((result) => {
-      console.log(result);
+      console.log('result:', result);
       var image = window.URL.createObjectURL(result);
-
       console.log(image);
-
       const file = new File([result], 'image.png', { type: 'image/png' });
       console.log(file);
       setCreatedfile(file);
-
       const reader = new FileReader();
-
       reader.readAsDataURL(file);
       return new Promise((resolve) => {
         reader.onload = () => {
@@ -145,7 +147,7 @@ export const emoticonAdd = (file, setEmoticonList) => {
   var formData = new FormData();
   formData.append('file', file);
   console.log(formData);
-  fetch('http://127.0.0.1:5000/anime', {
+  fetch('http://127.0.0.1:5001/anime', {
     method: 'POST',
     headers: {
       //'Content-Type': 'multipart/form-data',
@@ -154,22 +156,32 @@ export const emoticonAdd = (file, setEmoticonList) => {
     },
     body: formData,
   })
-    .then((res) => res.blob())
+    .then((res) => res.json())
     .then((result) => {
-      console.log(result);
-      var image = window.URL.createObjectURL(result);
-      console.log(image);
-      const file = new File([result], 'image.png', { type: 'image/png' });
-      console.log(file);
-      //setCreatedfile(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      return new Promise((resolve) => {
-        reader.onload = () => {
-          // 미리보기 사진
-          //setCreatedPreview(reader.result);
-          resolve();
-        };
-      });
+      if (result.success) {
+        alert('아바타가 삭제되었습니다.');
+        window.location.reload();
+      } else {
+        alert('다시 시도해주세요.');
+      }
+    });
+};
+
+// 이모티콘 불러오기
+export const onEmoticonGet = (setEmoticonList) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+  fetch(API_BASE_URL + '/api/v1/avatar/basic/emoticons' + parseInt(id), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        setEmoticonList(result.list);
+      }
     });
 };
