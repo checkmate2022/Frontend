@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import PurpleButton from '../PurpleButton';
@@ -8,6 +8,7 @@ import {
   emoticonModalState,
   selectedEmoticonState,
 } from '../../store/boardstore';
+import { onEmoticonGet } from '../../api/avatar';
 
 const Container = styled.div`
   display: flex;
@@ -76,9 +77,16 @@ function CommentAdd({
     selectedEmoticonState
   );
 
+  const [emoticonList, setEmoticonList] = useState([]);
+
   const emoticonOpen = () => {
     setIsOpen((prev) => !prev);
   };
+
+  // 이모티콘 불러오기
+  useEffect(() => {
+    onEmoticonGet(setEmoticonList);
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -111,14 +119,14 @@ function CommentAdd({
 
       {isOpen && (
         <EmoticonContainer>
-          {imgsrc.map((img) => (
+          {emoticonList.map((img, index) => (
             <EmoticonImg
-              key={img.id}
-              src={img.src}
+              key={index}
+              src={img}
               type='edit'
               onClick={() => {
-                setEmoticonUrl(img.src);
-                setSelectedEmoticon(img.src);
+                setEmoticonUrl(img);
+                setSelectedEmoticon(img);
                 setIsOpen(false);
               }}
             />
@@ -128,25 +136,6 @@ function CommentAdd({
     </form>
   );
 }
-
-let imgsrc = [
-  {
-    id: 0,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry_melon.png',
-  },
-  {
-    id: 1,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy_melon.png',
-  },
-  {
-    id: 2,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad_melon.png',
-  },
-  {
-    id: 3,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink_melon.png',
-  },
-];
 
 const iconstyle = {
   cursor: 'pointer',

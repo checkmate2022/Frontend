@@ -1,15 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import Modal from 'react-modal';
 import GreyButton from '../GreyButton';
 import GreyLabel from '../GreyLabel';
-
-const videoConstraints = {
-  width: 600,
-  height: 620,
-  facingMode: 'user',
-};
-
 const customStyles = {
   content: {
     top: '50%',
@@ -20,9 +13,29 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
   },
 };
-
-function WebcamModal({ setImgSrc, setImgfile }) {
+const WebcamModal = ({ setImgSrc, setImgfile }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [deviceId, setDeviceId] = useState('');
+
+  const handleDevices = useCallback(
+    (mediaDevices) => {
+      setDeviceId(
+        mediaDevices.filter(({ kind }) => kind === 'videoinput')[0].deviceId
+      );
+    },
+    [setDeviceId]
+  );
+
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then(handleDevices);
+  }, [handleDevices]);
+
+  const videoConstraints = {
+    width: 600,
+    height: 620,
+    facingMode: 'selfie',
+    deviceId: deviceId,
+  };
 
   const openModal = () => {
     setIsOpen(true);
@@ -37,21 +50,17 @@ function WebcamModal({ setImgSrc, setImgfile }) {
 
   const dataURLtoFile = (url) => {
     fetch(url)
-  .then(res => res.blob())
-  .then(blob => {
-    const file = new File([blob], "origin.png",{ type: "image/png" });
-    setImgfile(file);
-
-  })
-}
-
-
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], 'origin.png', { type: 'image/png' });
+        setImgfile(file);
+      });
+  };
 
   const capture = useCallback(() => {
     const img = webcamRef.current.getScreenshot();
     setImgSrc(img);
     dataURLtoFile(img);
-
     setIsOpen(false);
     //console.log(img);
   }, [webcamRef, setImgSrc]);
@@ -70,6 +79,7 @@ function WebcamModal({ setImgSrc, setImgfile }) {
           videoConstraints={videoConstraints}
           audio={false}
           ref={webcamRef}
+          mirrored={true}
           screenshotFormat='image/jpeg'
         />
         <div
@@ -97,6 +107,5 @@ function WebcamModal({ setImgSrc, setImgfile }) {
       </Modal>
     </div>
   );
-}
-
+};
 export default WebcamModal;

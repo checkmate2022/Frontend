@@ -17,8 +17,8 @@ import { onUsernameInfoGet } from '../../api/auth';
 
 const ACESS_TOKEN = 'ACESS_TOKEN';
 const API_BASE_URL = 'http://localhost:8080';
-const OPENVIDU_SERVER_URL = 'https://' + window.location.hostname + ':4443';
-///const OPENVIDU_SERVER_URL = 'https://52.79.239.28:4443';
+//const OPENVIDU_SERVER_URL = 'https://' + window.location.hostname + ':4443';
+const OPENVIDU_SERVER_URL = 'https://3.36.74.90';
 const OPENVIDU_SERVER_SECRET = 'MY_SECRET';
 
 const Container = styled.div`
