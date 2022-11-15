@@ -11,16 +11,19 @@ import {
   Loading,
 } from '../../components';
 import { avatarAddapi, avatarChangeApi, emoticonAdd } from '../../api/avatar';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 11% 0 3% 6%;
 `;
+
 const LabelContainer = styled.div`
   display: flex;
   width: fit-content;
 `;
+
 const StyledInput = styled.input`
   width: ${({ width }) => (width === 'disabled' ? 290 : 100)}px;
   height: 6px;
@@ -34,6 +37,7 @@ const StyledInput = styled.input`
     outline: 0.3px solid ${colors.purple};
   }
 `;
+
 const StyledTextArea = styled.textarea`
   width: 500px;
   height: 55px;
@@ -48,6 +52,7 @@ const StyledTextArea = styled.textarea`
     outline: 0.3px solid ${colors.purple};
   }
 `;
+
 const ImgContainer = styled.div`
   overflow: hidden;
   width: 184px;
@@ -57,6 +62,7 @@ const ImgContainer = styled.div`
   border-radius: 15px;
   margin-bottom: 3%;
 `;
+
 const EmoticonImg = styled.img`
   width: 100px;
   height: 100px;
@@ -69,11 +75,14 @@ const AvatarAdd = () => {
   const [detail, setDetail] = useState('');
   const [avatarStyle, setAvatarStyle] = useState('');
   const [styleNum, SetStyleNum] = useState('');
+
   // 변환된 사진 & 사진 미리보기
   const [createdfile, setCreatedfile] = useState(null);
   const [createdPreview, setCreatedPreview] = useState(null);
+
   // 이모티콘 리스트
   const [emoticonList, setEmoticonList] = useState([]);
+
   // 라디오 버튼
   const avatarStyles = [
     'cartoon',
@@ -81,23 +90,27 @@ const AvatarAdd = () => {
     'anime',
     'arcane',
     'pixar',
-    '여신강림',
+    'webtoon',
   ];
   const onClickRadioButton = (e) => {
     setAvatarStyle(e.target.value);
   };
+
   // 화면 캡쳐 & 사진 미리보기
   const [imgSrc, setImgSrc] = useState(null);
   const [imgName, setImgName] = useState('');
   const [loading, setLoading] = useState(false);
+
   // 사진 삭제
   const onDeleteImg = () => {
     setImgName('');
     setImgSrc(null);
     setImgfile('');
   };
+
   // 아바타 이름 중복확인
   const onCheckName = () => {};
+
   // 아바타 변형(flask)
   const onAvatarChange = () => {
     if (avatarStyle === '여신강림') {
@@ -115,6 +128,7 @@ const AvatarAdd = () => {
       setLoading
     );
   };
+
   // 아바타 등록
   const onAvatarAdd = () => {
     avatarAddapi(
@@ -125,18 +139,28 @@ const AvatarAdd = () => {
         avatarStyleId: parseInt(styleNum),
       },
       imgfile,
-      createdfile
+      createdfile,
+      emoticonList
     );
   };
-  // 이모티콘 생성
-  const onEmoticonAdd = () => {
-    emoticonAdd(createdfile, setEmoticonList);
-  };
+
   // 로딩 딜레이
   const [isEmoticonLoading, setIsEmoticonLoading] = useState(false);
   const [isEmoticon, setIsEmoticon] = useState(false);
 
+  // 이모티콘 생성
+  const onEmoticonAdd = () => {
+    setEmoticonList([]);
+    emoticonAdd(
+      createdfile,
+      setEmoticonList,
+      setIsEmoticonLoading,
+      setIsEmoticon
+    );
+  };
+
   console.log(createdfile);
+
   return (
     <Container>
       {loading ? <Loading /> : null}
@@ -240,35 +264,31 @@ const AvatarAdd = () => {
             height='40px'
           />
         )}
-        {isEmoticon &&
-          emoticonList.map((emoticon) => <EmoticonImg src={emoticon} />)}
+
+        {isEmoticon && (
+          <div style={{ flexDirection: 'row' }}>
+            <EmoticonImg src={emoticonList.happy} />
+            <EmoticonImg src={emoticonList.angry} />
+            <EmoticonImg src={emoticonList.sad} />
+            <EmoticonImg src={emoticonList.wink} />
+          </div>
+        )}
       </div>
+
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <PurpleButton text='완료' onClick={onAvatarAdd} />
       </div>
+
       <img alt='cartoon' src='images/cartoon_style.png' />
       <img alt='caricature' src='images/caricature_style.png' />
       <img alt='anime' src='images/anime_style.png' />
-      <img alt='webtoon' src='images/webtoon_style.png' />
+      <img
+        alt='webtoon'
+        src='images/webtoon_style.jpg'
+        style={{ width: '300px', height: '300px' }}
+      />
     </Container>
   );
 };
-let imgsrc = [
-  {
-    id: 0,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry.png',
-  },
-  {
-    id: 1,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy.png',
-  },
-  {
-    id: 2,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad.png',
-  },
-  {
-    id: 3,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink.png',
-  },
-];
+
 export default AvatarAdd;

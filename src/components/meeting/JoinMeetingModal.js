@@ -140,13 +140,13 @@ function JoinMeetingModal({ modalIsOpen, setIsOpen }) {
 
   // 회의 생성
   const createSession = () => {
-    if (avatarStyle === undefined) {
-      onCreateSession(meetingId);
-      alert('아바타를 선택해주세요!');
-    } else {
-      //window.location.href = `/team/${teamId}/meeting/${meetingId}`;
-      navigate(`/team/${teamId}/meeting/${meetingId}`);
-    }
+    // if (avatarStyle === undefined) {
+    //   onCreateSession(meetingId);
+    //   alert('아바타를 선택해주세요!');
+    // } else {
+    //   //window.location.href = `/team/${teamId}/meeting/${meetingId}`;
+    //   navigate(`/team/${teamId}/meeting/${meetingId}`);
+    // }
     navigate(`/team/${teamId}/meeting/${meetingId}`);
   };
 

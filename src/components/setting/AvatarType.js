@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import moment from 'moment';
 import { onAvatarDelete } from '../../api/avatar';
+import { BsDownload } from 'react-icons/bs';
 
 const Container = styled.div`
   width: 280px;
@@ -109,6 +110,30 @@ function AvatarType({ avatar, add }) {
     window.location.href = '/avataradd';
   };
 
+  // 이미지 다운로드
+  const downloadFile = (url) => {
+    fetch(url, { method: 'GET' })
+      .then((res) => {
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '아바타';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout((_) => {
+          window.URL.revokeObjectURL(url);
+        }, 60000);
+        a.remove();
+        setOpen(false);
+      })
+      .catch((err) => {
+        console.error('err: ', err);
+      });
+  };
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ display: 'flex' }}>
@@ -134,6 +159,7 @@ function AvatarType({ avatar, add }) {
               <StyledText>캐릭터 설명: {item.avatarDescription}</StyledText>
             </DetailContainer>
             <ButtonContainer>
+              <BsDownload onClick={() => downloadFile(item.avatarCreatedUrl)} />
               <TextButton onClick={() => onDelete(item.avatarSeq)}>
                 삭제
               </TextButton>

@@ -6,7 +6,12 @@ const ACCESS_TOKEN = 'ACCESS_TOKEN';
 export const onAvatarNameCheck = (name, setAvatarName) => {};
 
 // 아바타 등록
-export const avatarAddapi = (avatarInfo, imgfile, createdfile) => {
+export const avatarAddapi = (
+  avatarInfo,
+  imgfile,
+  createdfile,
+  emoticonList
+) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
   var formData = new FormData();
@@ -19,7 +24,11 @@ export const avatarAddapi = (avatarInfo, imgfile, createdfile) => {
   formData.append('avatarDescription', avatarInfo.avatarDescription);
   formData.append('avatarStyle', avatarInfo.avatarStyle);
   formData.append('avatarStyleId', avatarInfo.avatarStyleId);
-
+  // 이모티콘
+  formData.append('sadEmoticon', emoticonList.sad);
+  formData.append('happyEmoticon', emoticonList.happy);
+  formData.append('winkEmoticon', emoticonList.wink);
+  formData.append('angryEmoticon', emoticonList.angry);
   console.log(formData);
 
   fetch(API_BASE_URL + '/api/v1/avatar', {
@@ -36,10 +45,26 @@ export const avatarAddapi = (avatarInfo, imgfile, createdfile) => {
       console.log(result);
       if (result.success) {
         window.location.href = '/avatarsetting';
+        onAvatarBasic(result.data.avatarSeq);
       } else {
         alert('다시 시도해주세요!');
       }
     });
+};
+
+// 아바타 기본 설정
+export const onAvatarBasic = (avatarId) => {
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
+  fetch(API_BASE_URL + `/api/v1/avatar/isBasic/${avatarId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+    .then((res) => res.json())
+    .then((result) => {});
 };
 
 // 아바타 변환
@@ -60,7 +85,7 @@ export const avatarChangeApi = (
   formData.append('name', avatarInfo.name);
   console.log(formData);
   setLoading(true);
-  fetch('http://127.0.0.1:5000/aa', {
+  fetch('http://172.20.7.122:5000/aa', {
     method: 'POST',
     headers: {
       //'Content-Type': 'multipart/form-data',
@@ -148,7 +173,7 @@ export const emoticonAdd = (file, setEmoticonList, setIsEmoticonLoading) => {
   var formData = new FormData();
   formData.append('file', file);
   console.log(formData);
-  fetch('http://127.0.0.1:5001/anime', {
+  fetch('http://172.20.7.122:5001/anime', {
     method: 'POST',
     headers: {
       //'Content-Type': 'multipart/form-data',
@@ -169,7 +194,7 @@ export const emoticonAdd = (file, setEmoticonList, setIsEmoticonLoading) => {
 // 이모티콘 불러오기
 export const onEmoticonGet = (setEmoticonList) => {
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
-  fetch(API_BASE_URL + '/api/v1/avatar/basic/emoticons' + parseInt(id), {
+  fetch(API_BASE_URL + '/api/v1/avatar/basic/emoticons', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -180,6 +205,7 @@ export const onEmoticonGet = (setEmoticonList) => {
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
+        console.log(result);
         setEmoticonList(result.list);
       }
     });

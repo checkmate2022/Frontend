@@ -122,11 +122,11 @@ function CommentAdd({
           {emoticonList.map((img, index) => (
             <EmoticonImg
               key={index}
-              src={img}
+              src={img.emoticonUrl}
               type='edit'
               onClick={() => {
-                setEmoticonUrl(img);
-                setSelectedEmoticon(img);
+                setEmoticonUrl(img.emoticonUrl);
+                setSelectedEmoticon(img.emoticonUrl);
                 setIsOpen(false);
               }}
             />
