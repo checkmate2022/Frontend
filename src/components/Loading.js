@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import spinner from '../styles/icons/spinner2.gif';
 
 const Background = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   top: 0;

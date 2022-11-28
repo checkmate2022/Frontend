@@ -18,9 +18,14 @@ const Video = styled.video`
 
   width: 80%;
   height: 80%;
-  transform: rotateY(180deg);
-  object-fit: none;
-  //object-fit: contain;
+  //object-fit: none;
+  object-fit: contain;
+
+  /*Mirror code starts*/
+  // transform: rotateY(180deg);
+  // -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+  // -moz-transform:rotateY(180deg); /* Firefox */
+  /*Mirror code ends*/
 `;
 
 function UserVideo({ streamManager, count }) {

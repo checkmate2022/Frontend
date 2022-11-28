@@ -64,8 +64,8 @@ const ImgContainer = styled.div`
 `;
 
 const EmoticonImg = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 10px;
 `;
 const AvatarAdd = () => {
@@ -151,12 +151,7 @@ const AvatarAdd = () => {
   // 이모티콘 생성
   const onEmoticonAdd = () => {
     setEmoticonList([]);
-    emoticonAdd(
-      createdfile,
-      setEmoticonList,
-      setIsEmoticonLoading,
-      setIsEmoticon
-    );
+    emoticonAdd(avatarName, createdfile, setEmoticonList, setIsEmoticonLoading);
   };
 
   console.log(createdfile);
@@ -264,8 +259,7 @@ const AvatarAdd = () => {
             height='40px'
           />
         )}
-
-        {isEmoticon && (
+        {emoticonList.length !== 0 && (
           <div style={{ flexDirection: 'row' }}>
             <EmoticonImg src={emoticonList.happy} />
             <EmoticonImg src={emoticonList.angry} />

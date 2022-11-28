@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { onScheduleGet, onScheduleDelete } from '../../api/teamschedule';
 import moment from 'moment-timezone';
 import 'moment/locale/ko';
+import { useNavigate } from 'react-router-dom';
 
 const customStyles = {
   content: {
@@ -62,6 +63,7 @@ const ScheduleContainer = styled.div`
 
 const ScheduleDetail = ({ scheduleId, modalIsOpen, setIsOpen }) => {
   const teamid = useRecoilValue(teamState);
+  const navigate = useNavigate();
 
   // 일정 리스트
   const [schedule, setSchedule] = useState();
@@ -70,14 +72,16 @@ const ScheduleDetail = ({ scheduleId, modalIsOpen, setIsOpen }) => {
     onScheduleGet(scheduleId, setSchedule);
   }, []);
 
-  console.log(scheduleId, schedule);
-
   const closeModal = () => {
     setIsOpen(false);
   };
 
+  console.log(schedule);
+
   // 일정 수정 페이지로
-  const ScheduleChangePage = () => {};
+  const ScheduleChangePage = () => {
+    navigate(`/team/${teamid}/dashboard/${scheduleId}`, { state: schedule });
+  };
 
   // 일정 삭제
   const ScheduleDelete = (id) => {

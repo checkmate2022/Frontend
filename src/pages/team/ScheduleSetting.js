@@ -10,9 +10,10 @@ import {
 import { useRecoilValue } from 'recoil';
 import { teamState } from '../../store/userstore';
 import 'react-datepicker/dist/react-datepicker.css';
-import { onScheduleAdd, onScheduleDelete } from '../../api/teamschedule';
-import moment, { localeData } from 'moment';
+import { onScheduleChange, onScheduleDelete } from '../../api/teamschedule';
 import { useLocation } from 'react-router-dom';
+import moment from 'moment-timezone';
+import 'moment/locale/ko';
 
 const Container = styled.div`
   display: flex;
@@ -39,6 +40,7 @@ const StyledInput = styled.input`
   font-size: 14px;
   padding: 12px;
   margin: 0 5px 1% 0;
+  cursor: ${({ typestyle }) => (typestyle === 'date' ? 'pointer' : 'auto')};
 
   &:focus {
     outline: 0.3px solid ${colors.purple};
@@ -75,27 +77,26 @@ const TitleText = styled.span`
 
 const ScheduleSetting = () => {
   const teamId = useRecoilValue(teamState);
-
-  const location = useLocation();
+  const offset = new Date().getTimezoneOffset() * 60000;
 
   // 일정 정보 가져오기
-  const item = location.state.item;
-  console.log(item);
+  const location = useLocation();
+  const schedule = location.state;
 
   // 일정 정보
-  const [scheduleName, setScheduleName] = useState(item.scheduleName);
-  const [scheduleType, setScheduleType] = useState(item.scheduleType);
+  const [scheduleName, setScheduleName] = useState(schedule.scheduleName);
+  const [scheduleType, setScheduleType] = useState(schedule.scheduleType);
   const [participantName, setParticipantName] = useState([]);
   const [scheduleDescription, setScheduleDescription] = useState(
-    item.scheduleDescription
+    schedule.scheduleDescription
   );
 
   // 시작과 끝 시간
   const [scheduleStartDate, setScheduleStartDate] = useState(
-    new Date(item.scheduleStartDate)
+    new Date(schedule.scheduleStartDate)
   );
   const [scheduleEndDate, setScheduleEndDate] = useState(
-    new Date(item.scheduleEndDate)
+    new Date(schedule.scheduleEndDate)
   );
 
   // 일정 수정
@@ -103,22 +104,21 @@ const ScheduleSetting = () => {
     let namelist = [];
     participantName.map((member) => namelist.push(member.username));
 
-    onScheduleAdd(
+    onScheduleChange(
       scheduleName,
       scheduleDescription,
-      moment(scheduleStartDate).format('yyyy-MM-dd HH:mm:ss'),
-      moment(scheduleEndDate).format('yyyy-MM-dd HH:mm:ss'),
-      // scheduleStartDate,
-      // scheduleEndDate,
+      moment.tz(new Date(scheduleStartDate - offset), 'Asia/Seoul'),
+      moment.tz(new Date(scheduleEndDate - offset), 'Asia/Seoul'),
+      scheduleType,
       namelist,
       teamId,
-      item.scheduleSeq
+      schedule.scheduleSeq
     );
   };
 
   // 일정 삭제
   const onScheduleDeleteButton = () => {
-    onScheduleDelete(teamId, item.scheduleSeq);
+    onScheduleDelete(teamId, schedule.scheduleSeq);
   };
 
   return (
@@ -174,8 +174,8 @@ const ScheduleSetting = () => {
 };
 
 const OPTIONS = [
-  { value: 'DEFAULT', name: '일정' },
-  { value: 'MEETING', name: '회의' },
+  { value: 'BASIC', name: '일정' },
+  { value: 'CONFERENCE', name: '회의' },
 ];
 
 export default ScheduleSetting;

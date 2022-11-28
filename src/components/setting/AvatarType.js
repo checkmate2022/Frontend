@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../styles/theme';
 import moment from 'moment';
-import { onAvatarDelete } from '../../api/avatar';
+import { onAvatarBasic, onAvatarDelete } from '../../api/avatar';
 import { BsDownload } from 'react-icons/bs';
 
 const Container = styled.div`
@@ -112,6 +112,7 @@ function AvatarType({ avatar, add }) {
 
   // 이미지 다운로드
   const downloadFile = (url) => {
+    console.log(url);
     fetch(url, { method: 'GET' })
       .then((res) => {
         return res.blob();
@@ -120,18 +121,23 @@ function AvatarType({ avatar, add }) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = '아바타';
+        a.download = 'avatwin';
         document.body.appendChild(a);
         a.click();
         setTimeout((_) => {
           window.URL.revokeObjectURL(url);
         }, 60000);
         a.remove();
-        setOpen(false);
+        //setOpen(false);
       })
       .catch((err) => {
         console.error('err: ', err);
       });
+  };
+
+  // 기본 설정
+  const onBasic = (id) => {
+    onAvatarBasic(id);
   };
 
   return (
@@ -159,11 +165,21 @@ function AvatarType({ avatar, add }) {
               <StyledText>캐릭터 설명: {item.avatarDescription}</StyledText>
             </DetailContainer>
             <ButtonContainer>
-              <BsDownload onClick={() => downloadFile(item.avatarCreatedUrl)} />
+              {/* <BsDownload style={{cursor: 'pointer'}} onClick={() => downloadFile(item.avatarCreatedUrl)} /> */}
+
+              <a
+                href={item.avatarCreatedUrl}
+                style={{ cursor: 'pointer', display: 'none' }}
+              >
+                <BsDownload style={{ cursor: 'pointer' }} />
+              </a>
               <TextButton onClick={() => onDelete(item.avatarSeq)}>
                 삭제
               </TextButton>
               <TextButton onClick={onChange}>수정</TextButton>
+              <TextButton onClick={() => onBasic(item.avatarSeq)}>
+                기본 설정
+              </TextButton>
             </ButtonContainer>
           </Container>
         ))}
