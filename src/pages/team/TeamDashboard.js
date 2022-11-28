@@ -62,6 +62,7 @@ const TeamDashboard = () => {
 
   // 선택 날짜
   const [selectedDate, setSelectedDate] = useState('');
+  const [scheduleId, setScheduleId] = useState(undefined);
 
   const openModal = (item) => {
     setIsOpen(true);
@@ -71,7 +72,7 @@ const TeamDashboard = () => {
   // 일정 상세 모달
   const openDetailModal = (item) => {
     setDetailModalIsOpen(true);
-    setSelectedDate(item);
+    setScheduleId(item);
   };
 
   // 회의/일정 등록 페이지 이동
@@ -186,7 +187,7 @@ const TeamDashboard = () => {
       />
       {detailModalIsOpen ? (
         <ScheduleDetail
-          scheduleId={selectedDate}
+          scheduleId={scheduleId}
           modalIsOpen={detailModalIsOpen}
           setIsOpen={setDetailModalIsOpen}
         />

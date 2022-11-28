@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '../app-config';
 
 const ACCESS_TOKEN = 'ACCESS_TOKEN';
+const AVATAR_API = 'http://172.20.73.191:';
 
 // 아바타 이름 중복확인
 export const onAvatarNameCheck = (name, setAvatarName) => {};
@@ -85,7 +86,7 @@ export const avatarChangeApi = (
   formData.append('name', avatarInfo.name);
   console.log(formData);
   setLoading(true);
-  fetch('http://172.20.7.122:5000/aa', {
+  fetch(AVATAR_API + '5000/aa', {
     method: 'POST',
     headers: {
       //'Content-Type': 'multipart/form-data',
@@ -94,6 +95,7 @@ export const avatarChangeApi = (
     },
     body: formData,
   })
+    // .then(setTimeout(() => setLoading(false), 30000))
     .then((res) => {
       if (res.status === 200) {
         return res.blob();
@@ -167,13 +169,20 @@ export const onAvatarDelete = (id) => {
 };
 
 // 이모티콘 변환
-export const emoticonAdd = (file, setEmoticonList, setIsEmoticonLoading) => {
+export const emoticonAdd = (
+  avatarName,
+  file,
+  setEmoticonList,
+  setIsEmoticonLoading
+) => {
+  console.log(file, setEmoticonList);
   const accessToken = localStorage.getItem(ACCESS_TOKEN);
   setIsEmoticonLoading(true);
   var formData = new FormData();
+  formData.append('name', avatarName);
   formData.append('file', file);
   console.log(formData);
-  fetch('http://172.20.7.122:5001/anime', {
+  fetch(AVATAR_API + '5001/anime', {
     method: 'POST',
     headers: {
       //'Content-Type': 'multipart/form-data',
@@ -182,11 +191,14 @@ export const emoticonAdd = (file, setEmoticonList, setIsEmoticonLoading) => {
     },
     body: formData,
   })
+    // .then(setTimeout(() => setIsEmoticonLoading(false), 30000))
     .then((res) => res.json())
     .then((result) => {
+      setIsEmoticonLoading(false);
       if (result) {
-        setIsEmoticonLoading(false);
-        setEmoticonList(result);
+        setEmoticonList(result[0]);
+      } else {
+        alert('다시 시도해주세요!');
       }
     });
 };

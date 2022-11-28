@@ -73,6 +73,7 @@ export const onScheduleChange = (
   scheduleDescription,
   scheduleStartDate,
   scheduleEndDate,
+  scheduleType,
   participantName,
   teamid,
   scheduleId
@@ -85,6 +86,7 @@ export const onScheduleChange = (
     scheduleStartDate: scheduleStartDate,
     scheduleEndDate: scheduleEndDate,
     participantName: participantName,
+    scheduleType: scheduleType,
     teamId: teamid,
   };
 
@@ -102,7 +104,7 @@ export const onScheduleChange = (
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        window.location.href = `/dashboard/${teamid}/schedulesetting`;
+        window.location.href = `/team/${teamid}/dashboard/`;
       } else {
         alert('다시 시도해주세요!');
       }

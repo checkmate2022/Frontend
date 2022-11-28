@@ -99,6 +99,8 @@ function ChattingBar({ session, streamManager, userName }) {
 
   const [emoticonList, setEmoticonList] = useState([]);
 
+  console.log(emoticonList);
+
   // 이모티콘 불러오기
   useEffect(() => {
     onEmoticonGet(setEmoticonList);
@@ -221,8 +223,8 @@ function ChattingBar({ session, streamManager, userName }) {
                 {emoticonList.map((img, index) => (
                   <EmoticonImg
                     key={index}
-                    src={img}
-                    onClick={() => sendEmoticon(img)}
+                    src={img.emoticonUrl}
+                    onClick={() => sendEmoticon(img.emoticonUrl)}
                   />
                 ))}
               </EmoticonsContainer>
@@ -247,26 +249,6 @@ function ChattingBar({ session, streamManager, userName }) {
     </Container>
   );
 }
-
-// 임시 테스트 데이터
-let imgsrc = [
-  {
-    id: 0,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/angry_jamong.png',
-  },
-  {
-    id: 1,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/happy_jamong.png',
-  },
-  {
-    id: 2,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/sad_jamong.png',
-  },
-  {
-    id: 3,
-    src: 'https://checkmatebucket.s3.ap-northeast-2.amazonaws.com/emoticons/wink_jamong.png',
-  },
-];
 
 const iconstyle = {
   cursor: 'pointer',
